@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Visualizer</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2>DSA Visualizer</h2>
+            <nav>
+                <ul>
+                    <li><a href="#"><span>🏠</span> Home</a></li>
+                    <li><a href="#"><span>📚</span> Algorithms</a></li>
+                    <li><a href="#"><span>🏗️</span> Data Structures</a></li>
+                    <li><a href="#"><span>⚙️</span> Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="welcome">
+                    <h1 id="welcomeMsg">Welcome to DSA Visualizer</h1>
+                </div>
+                <button id="logoutBtn">Logout</button>
+            </header>
+
+            <section class="dsa-section">
+                <h2>Data Structures & Algorithms Visualizer</h2>
+                
+                <div class="dsa-buttons">
+                    <button class="dsa-btn" data-algo="bubble">Bubble Sort</button>
+                    <button class="dsa-btn" data-algo="selection">Selection Sort</button>
+                    <button class="dsa-btn" data-algo="insertion">Insertion Sort</button>
+                    <button class="dsa-btn" data-algo="search">Searching</button>
+                    <button class="dsa-btn" data-algo="stack">Stack</button>
+                    <button class="dsa-btn" onclick="loadQueueSelection()">Queue</button>
+                    <button class="dsa-btn" data-algo="linkedlist">Linked List</button>
+                    <button class="dsa-btn" data-algo="bst">Binary Search Tree</button>
+                    <button class="dsa-btn" data-algo="avl">AVL Tree</button>
+                </div>
+
+                <div id="algorithmContent" class="visualization-container">
+                    <!-- Content loaded by JavaScript -->
+                    <h3>Select an Algorithm</h3>
+                    <p>Choose an algorithm from the buttons above to visualize its working.</p>
+                    <div class="info-panel">
+                        <h4>How to use:</h4>
+                        <p>1. Click any algorithm button</p>
+                        <p>2. Generate or enter array elements</p>
+                        <p>3. Use controls to visualize step-by-step</p>
+                        <p>4. Watch the steps in the output panel</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script src="algorithms.js"></script>
+</body>
+</html>
