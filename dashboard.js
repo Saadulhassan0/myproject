@@ -104,65 +104,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to load algorithm
 function loadAlgorithm(algoType) {
-    const homeView = document.getElementById('homeView');
-    const vizView = document.getElementById('visualizationView');
+    // Hide home view and show visualization view
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('visualizationView').style.display = 'block';
 
-    // Smooth transition
-    homeView.style.opacity = '0';
-    setTimeout(() => {
-        homeView.style.display = 'none';
-        vizView.style.display = 'block';
-        vizView.style.opacity = '0';
-        setTimeout(() => {
-            vizView.style.opacity = '1';
-        }, 50);
-
-        // Update active button
-        document.querySelectorAll('.dsa-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        const activeBtn = document.querySelector(`.dsa-btn[data-algo="${algoType}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
-
-        if (typeof showAlgorithm === 'function') {
-            showAlgorithm(algoType);
-        }
-    }, 200);
-}
-
-// Function to update active sidebar link
-function updateActiveNavLink() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.sidebar nav ul li a');
-    navLinks.forEach(link => {
-        if (currentPath.includes(link.getAttribute('href'))) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
+    // Update active button
+    document.querySelectorAll('.dsa-btn').forEach(btn => {
+        btn.classList.remove('active');
     });
+
+    // Find and activate the clicked button
+    const activeBtn = document.querySelector(`.dsa-btn[data-algo="${algoType}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+
+    // Call algorithm function
+    if (typeof showAlgorithm === 'function') {
+        showAlgorithm(algoType);
+    } else {
+        console.error('showAlgorithm function not found!');
+        document.getElementById('algorithmContent').innerHTML = `
+            <h3>Error Loading Algorithm</h3>
+            <p>The algorithms.js file might not be loaded properly.</p>
+            <p>Please refresh the page.</p>
+        `;
+    }
 }
-updateActiveNavLink();
 
 // Function to load queue selection
 function loadQueueSelection() {
-    const homeView = document.getElementById('homeView');
-    const vizView = document.getElementById('visualizationView');
+    // Hide home view and show visualization view
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('visualizationView').style.display = 'block';
 
-    homeView.style.opacity = '0';
-    setTimeout(() => {
-        homeView.style.display = 'none';
-        vizView.style.display = 'block';
-        vizView.style.opacity = '0';
-        setTimeout(() => {
-            vizView.style.opacity = '1';
-        }, 50);
+    // Update active button
+    document.querySelectorAll('.dsa-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
 
-        if (typeof showQueueSelection === 'function') {
-            showQueueSelection();
-        }
-    }, 200);
+    // Activate Queue button
+    const queueBtn = document.querySelector('.dsa-btn[data-algo="queue"]') ||
+        Array.from(document.querySelectorAll('.dsa-btn')).find(b => b.textContent.includes('Queue'));
+    if (queueBtn) {
+        queueBtn.classList.add('active');
+    }
+
+    // Call queue selection function
+    if (typeof showQueueSelection === 'function') {
+        showQueueSelection();
+    } else {
+        console.error('showQueueSelection function not found!');
+        document.getElementById('algorithmContent').innerHTML = `
+            <h3>Error Loading Queue Selection</h3>
+            <p>Please refresh the page.</p>
+        `;
+    }
 }
 
 // Function to go back to main menu

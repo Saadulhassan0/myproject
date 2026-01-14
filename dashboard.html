@@ -10,7 +10,8 @@
 
 <body class="has-sidebar">
     <div class="dashboard-container">
-        <aside class="sidebar" id="sidebar">
+        <button id="backBtn" class="back-btn" style="display: none;" onclick="goBackToMenu()">← Back to Menu</button>
+        <aside class="sidebar">
             <h2>DSA Visualizer</h2>
             <nav>
                 <ul>
@@ -23,8 +24,6 @@
         </aside>
 
         <main class="main-content">
-            <button id="backBtn" class="back-btn" style="display: none;" onclick="goBackToMenu()">← Back to
-                Menu</button>
             <header>
                 <div class="welcome">
                     <h1 id="welcomeMsg">Welcome to DSA Visualizer</h1>
@@ -47,15 +46,15 @@
                 </div>
 
                 <div class="dsa-buttons" id="algoButtonsContainer">
-                    <button class="dsa-btn" data-algo="bubble"><span>🫧</span> Bubble Sort</button>
-                    <button class="dsa-btn" data-algo="selection"><span>🎯</span> Selection Sort</button>
-                    <button class="dsa-btn" data-algo="insertion"><span>📥</span> Insertion Sort</button>
-                    <button class="dsa-btn" data-algo="search"><span>🔍</span> Searching</button>
-                    <button class="dsa-btn" data-algo="stack"><span>📚</span> Stack</button>
-                    <button class="dsa-btn" data-algo="queue"><span>🚶</span> Queue</button>
-                    <button class="dsa-btn" data-algo="linkedlist"><span>🔗</span> Linked List</button>
-                    <button class="dsa-btn" data-algo="bst"><span>🌲</span> BST</button>
-                    <button class="dsa-btn" data-algo="avl"><span>⚖️</span> AVL Tree</button>
+                    <button class="dsa-btn" data-algo="bubble">Bubble Sort</button>
+                    <button class="dsa-btn" data-algo="selection">Selection Sort</button>
+                    <button class="dsa-btn" data-algo="insertion">Insertion Sort</button>
+                    <button class="dsa-btn" data-algo="search">Searching</button>
+                    <button class="dsa-btn" data-algo="stack">Stack</button>
+                    <button class="dsa-btn" onclick="loadQueueSelection()">Queue</button>
+                    <button class="dsa-btn" data-algo="linkedlist">Linked List</button>
+                    <button class="dsa-btn" data-algo="bst">Binary Search Tree</button>
+                    <button class="dsa-btn" data-algo="avl">AVL Tree</button>
                 </div>
             </section>
 
@@ -64,8 +63,6 @@
                     <!-- Content loaded by JavaScript -->
                 </div>
             </section>
-
-            <button id="mobileFab" class="fab" onclick="resetVisualization()" title="Reset Visualization">🔄</button>
         </main>
     </div>
 
