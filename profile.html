@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - DSA Visualizer</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e1e5ee;
+            padding-bottom: 30px;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #eee;
+            object-fit: cover;
+            border: 4px solid #6c4ce0;
+        }
+
+        .profile-info h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .info-item label {
+            display: block;
+            font-weight: 600;
+            color: #6c4ce0;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .info-item span {
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body class="has-sidebar">
+    <div class="dashboard-container">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back Home</button>
+        <aside class="sidebar">
+            <h2>DSA Visualizer</h2>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html"><span>🏠</span> Home</a></li>
+                    <li><a href="profile.html"><span>👤</span> Profile</a></li>
+                    <li><a href="#"><span>⚙️</span> Settings</a></li>
+                    <li><a href="#" id="sidebarLogout"><span>🚪</span> Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="welcome">
+                    <h1>User Profile</h1>
+                </div>
+                <div class="header-actions">
+                    <img id="globalProfilePic" class="global-profile-pic" src="https://via.placeholder.com/40"
+                        alt="Profile" onclick="window.location.href='profile.html'">
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </header>
+
+            <section class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <img src="https://via.placeholder.com/150" alt="Profile" class="profile-pic" id="userPic">
+                        <div class="profile-info">
+                            <h3 id="userName">User Name</h3>
+                            <p id="userEmail">user@example.com</p>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Full Name</label>
+                            <span id="displayFullName">User Name</span>
+                        </div>
+                        <div class="info-item">
+                            <label>User Number / ID</label>
+                            <span id="userId">#0</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Phone Number</label>
+                            <span id="userPhone">0300-0000000</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Date of Birth</label>
+                            <span id="userDob">2000-01-01</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email Address</label>
+                            <span id="displayEmail">user@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span>Active Member</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check auth and load user data
+            fetch('http://localhost/myproject/check_auth.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.logged_in) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    if (data.user) {
+                        // Large profile card
+                        document.getElementById('userName').textContent = data.user.name;
+                        document.getElementById('userEmail').textContent = data.user.email;
+
+                        // Info grid fields
+                        document.getElementById('displayFullName').textContent = data.user.name;
+                        document.getElementById('displayEmail').textContent = data.user.email;
+                        document.getElementById('userId').textContent = '#' + data.user.id;
+                        document.getElementById('userPhone').textContent = data.user.phone || 'N/A';
+                        document.getElementById('userDob').textContent = data.user.dob || 'N/A';
+
+                        // Profile Pics
+                        if (data.user.profile_pic) {
+                            const largePicPath = data.user.profile_pic === 'default.png' ? 'https://via.placeholder.com/150' : 'uploads/' + data.user.profile_pic;
+                            const smallPicPath = data.user.profile_pic === 'default.png' ? 'https://via.placeholder.com/40' : 'uploads/' + data.user.profile_pic;
+
+                            document.getElementById('userPic').src = largePicPath;
+                            const globalPic = document.getElementById('globalProfilePic');
+                            if (globalPic) globalPic.src = smallPicPath;
+                        }
+                    }
+                })
+                .catch(err => console.error('Error fetching auth:', err));
+
+            // Logout
+            const logoutHandler = function (e) {
+                if (e) e.preventDefault();
+                fetch('http://localhost/myproject/logout.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = 'http://localhost/myproject/login.html';
+                        } else {
+                            alert('Logout failed: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        window.location.href = 'http://localhost/myproject/login.html';
+                    });
+            };
+            document.getElementById('logoutBtn').addEventListener('click', logoutHandler);
+            document.getElementById('sidebarLogout').addEventListener('click', logoutHandler);
+        });
+    </script>
+</body>
+
+</html>

@@ -6,6 +6,32 @@ let steps = [];
 let currentStep = 0;
 let currentAlgorithm = 'bubble';
 
+// ==================== STATS TRACKING ====================
+let algorithmStats = {
+    comparisons: 0,
+    swaps: 0,
+    passes: 0,
+    rotations: 0 // For Binary Search or Trees
+};
+
+function resetStats() {
+    algorithmStats = { comparisons: 0, swaps: 0, passes: 0, rotations: 0 };
+    updateStatsDisplay();
+}
+
+function updateStatsDisplay() {
+    const statsContainer = document.getElementById('algorithmStats');
+    if (!statsContainer) return;
+
+    let html = '';
+    if (algorithmStats.passes > 0) html += `<span><strong>Passes:</strong> ${algorithmStats.passes}</span>`;
+    if (algorithmStats.comparisons > 0) html += `<span><strong>Comparisons:</strong> ${algorithmStats.comparisons}</span>`;
+    if (algorithmStats.swaps > 0) html += `<span><strong>Swaps:</strong> ${algorithmStats.swaps}</span>`;
+    if (algorithmStats.rotations > 0) html += `<span><strong>Rotations/Steps:</strong> ${algorithmStats.rotations}</span>`;
+
+    statsContainer.innerHTML = html || '<span><em>Algorithm not started</em></span>';
+}
+
 // ==================== UTILITY FUNCTIONS ====================
 function generateArray(size = 8) {
     currentArray = [];
@@ -15,18 +41,28 @@ function generateArray(size = 8) {
     return currentArray;
 }
 
-function displayArray(arr, activeIndexes = [], comparingIndexes = [], sortedIndexes = [], swappingIndexes = []) {
+function displayArray(arr, activeIndexes = [], comparingIndexes = [], sortedIndexes = [], swappingIndexes = [], labels = {}) {
     const display = document.getElementById('arrayDisplay');
     if (!display) return;
-    
+
     display.innerHTML = '';
-    
+
     arr.forEach((value, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'element-wrapper';
+
+        if (labels[index]) {
+            const label = document.createElement('div');
+            label.className = 'element-label';
+            label.textContent = labels[index];
+            wrapper.appendChild(label);
+        }
+
         const element = document.createElement('div');
         element.className = 'array-element';
         element.textContent = value;
         element.setAttribute('data-index', index);
-        
+
         if (activeIndexes.includes(index)) {
             element.classList.add('active');
         }
@@ -39,8 +75,9 @@ function displayArray(arr, activeIndexes = [], comparingIndexes = [], sortedInde
         if (swappingIndexes.includes(index)) {
             element.classList.add('swapping');
         }
-        
-        display.appendChild(element);
+
+        wrapper.appendChild(element);
+        display.appendChild(wrapper);
     });
 }
 
@@ -52,7 +89,7 @@ function addStep(description) {
 function updateStepsDisplay() {
     const stepsContainer = document.getElementById('stepsOutput');
     if (!stepsContainer) return;
-    
+
     stepsContainer.innerHTML = '';
     steps.forEach((step, index) => {
         const stepElement = document.createElement('div');
@@ -60,7 +97,7 @@ function updateStepsDisplay() {
         stepElement.textContent = `Step ${index + 1}: ${step}`;
         stepsContainer.appendChild(stepElement);
     });
-    
+
     // Scroll to bottom
     stepsContainer.scrollTop = stepsContainer.scrollHeight;
 }
@@ -74,7 +111,7 @@ function clearSteps() {
 function showStatus(message, type = 'info') {
     const statusDiv = document.getElementById('statusMessage');
     if (!statusDiv) return;
-    
+
     statusDiv.className = `status-message status-${type}`;
     statusDiv.textContent = message;
 }
@@ -85,46 +122,53 @@ function showStatus(message, type = 'info') {
 async function startBubbleSort() {
     if (isAnimating) return;
     isAnimating = true;
-    
+    resetStats();
+
     const arr = [...currentArray];
     const n = arr.length;
     clearSteps();
     addStep(`Starting Bubble Sort on array: [${arr}]`);
-    
+
     for (let i = 0; i < n - 1; i++) {
+        algorithmStats.passes++;
+        updateStatsDisplay();
         addStep(`Pass ${i + 1}: Looking for largest element in remaining array`);
-        
+
         for (let j = 0; j < n - i - 1; j++) {
+            algorithmStats.comparisons++;
+            updateStatsDisplay();
             // Show comparison
-            displayArray(arr, [], [j, j + 1]);
+            displayArray(arr, [], [j, j + 1], Array.from({ length: i }, (_, k) => n - k - 1), [], { [j]: 'j', [j + 1]: 'j+1' });
             addStep(`Comparing elements at index ${j} (${arr[j]}) and ${j + 1} (${arr[j + 1]})`);
             await sleep(animationSpeed);
-            
+
             if (arr[j] > arr[j + 1]) {
+                algorithmStats.swaps++;
+                updateStatsDisplay();
                 // Show swapping
-                displayArray(arr, [], [], [], [j, j + 1]);
+                displayArray(arr, [], [], Array.from({ length: i }, (_, k) => n - k - 1), [j, j + 1], { [j]: 'swap', [j + 1]: 'swap' });
                 addStep(`Swapping ${arr[j]} and ${arr[j + 1]} because ${arr[j]} > ${arr[j + 1]}`);
                 await sleep(animationSpeed);
-                
+
                 // Swap
                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                
+
                 // Show after swap
-                displayArray(arr, [], [], [], [j, j + 1]);
+                displayArray(arr, [], [], Array.from({ length: i }, (_, k) => n - k - 1), [j, j + 1], { [j]: 'j', [j + 1]: 'j+1' });
                 addStep(`After swap: arr[${j}] = ${arr[j]}, arr[${j + 1}] = ${arr[j + 1]}`);
                 await sleep(animationSpeed);
             } else {
                 addStep(`No swap needed (${arr[j]} ≤ ${arr[j + 1]})`);
             }
         }
-        
+
         // Mark sorted element
-        displayArray(arr, [], [], Array.from({length: i + 1}, (_, k) => n - k - 1));
+        displayArray(arr, [], [], Array.from({ length: i + 1 }, (_, k) => n - k - 1));
         addStep(`Element ${arr[n - i - 1]} is now in its correct position at index ${n - i - 1}`);
         await sleep(animationSpeed);
     }
-    
-    displayArray(arr, [], [], Array.from({length: n}, (_, k) => k));
+
+    displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
     addStep(`Bubble Sort completed! Array is sorted: [${arr}]`);
     showStatus('Bubble Sort completed successfully!', 'success');
     isAnimating = false;
@@ -134,51 +178,59 @@ async function startBubbleSort() {
 async function startSelectionSort() {
     if (isAnimating) return;
     isAnimating = true;
-    
+    resetStats();
+
     const arr = [...currentArray];
     const n = arr.length;
     clearSteps();
     addStep(`Starting Selection Sort on array: [${arr}]`);
-    
+
     for (let i = 0; i < n - 1; i++) {
+        algorithmStats.passes++;
+        updateStatsDisplay();
         addStep(`Pass ${i + 1}: Finding minimum element from index ${i} to ${n - 1}`);
         let minIdx = i;
-        
+
         // Find minimum
         for (let j = i + 1; j < n; j++) {
-            displayArray(arr, [minIdx], [j]);
+            algorithmStats.comparisons++;
+            updateStatsDisplay();
+            displayArray(arr, [minIdx], [j], Array.from({ length: i }, (_, k) => k), [], { [minIdx]: 'minIdx', [j]: 'j' });
             addStep(`Comparing current min ${arr[minIdx]} with ${arr[j]}`);
             await sleep(animationSpeed);
-            
+
             if (arr[j] < arr[minIdx]) {
                 minIdx = j;
+                displayArray(arr, [minIdx], [], Array.from({ length: i }, (_, k) => k), [], { [minIdx]: 'minIdx' });
                 addStep(`New minimum found: ${arr[minIdx]} at index ${minIdx}`);
                 await sleep(animationSpeed);
             }
         }
-        
+
         // Swap if needed
         if (minIdx !== i) {
-            displayArray(arr, [i, minIdx], [], [], [i, minIdx]);
+            algorithmStats.swaps++;
+            updateStatsDisplay();
+            displayArray(arr, [i, minIdx], [], Array.from({ length: i }, (_, k) => k), [i, minIdx], { [i]: 'i', [minIdx]: 'minIdx' });
             addStep(`Swapping ${arr[i]} (index ${i}) with minimum ${arr[minIdx]} (index ${minIdx})`);
             await sleep(animationSpeed);
-            
+
             [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
-            
-            displayArray(arr, [i, minIdx], [], [], [i, minIdx]);
+
+            displayArray(arr, [i, minIdx], [], Array.from({ length: i }, (_, k) => k), [i, minIdx], { [i]: 'i', [minIdx]: 'minIdx' });
             addStep(`After swap: arr[${i}] = ${arr[i]}, arr[${minIdx}] = ${arr[minIdx]}`);
             await sleep(animationSpeed);
         } else {
             addStep(`Minimum is already at correct position (index ${i})`);
         }
-        
+
         // Mark sorted
-        displayArray(arr, [], [], Array.from({length: i + 1}, (_, k) => k));
+        displayArray(arr, [], [], Array.from({ length: i + 1 }, (_, k) => k));
         addStep(`Element ${arr[i]} is now in correct position at index ${i}`);
         await sleep(animationSpeed);
     }
-    
-    displayArray(arr, [], [], Array.from({length: n}, (_, k) => k));
+
+    displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
     addStep(`Selection Sort completed! Array is sorted: [${arr}]`);
     showStatus('Selection Sort completed successfully!', 'success');
     isAnimating = false;
@@ -188,36 +240,48 @@ async function startSelectionSort() {
 async function startInsertionSort() {
     if (isAnimating) return;
     isAnimating = true;
-    
+    resetStats();
+
     const arr = [...currentArray];
     const n = arr.length;
     clearSteps();
     addStep(`Starting Insertion Sort on array: [${arr}]`);
-    
+
     for (let i = 1; i < n; i++) {
-        addStep(`Pass ${i}: Inserting element ${arr[i]} into sorted subarray [0..${i-1}]`);
+        algorithmStats.passes++;
+        updateStatsDisplay();
+        addStep(`Pass ${i}: Inserting element ${arr[i]} into sorted subarray [0..${i - 1}]`);
         let key = arr[i];
         let j = i - 1;
-        
-        displayArray(arr, [i], [], Array.from({length: i}, (_, k) => k));
+
+        displayArray(arr, [i], [], Array.from({ length: i }, (_, k) => k), [], { [i]: 'key' });
         await sleep(animationSpeed);
-        
+
         while (j >= 0 && arr[j] > key) {
-            displayArray(arr, [j, j + 1], [], Array.from({length: i}, (_, k) => k));
+            algorithmStats.comparisons++;
+            algorithmStats.swaps++; // Treating shifts as swaps for stats consistency
+            updateStatsDisplay();
+            displayArray(arr, [j, j + 1], [], Array.from({ length: i }, (_, k) => k), [], { [j]: 'j', [j + 1]: 'j+1' });
             addStep(`Shifting ${arr[j]} to position ${j + 1} because ${arr[j]} > ${key}`);
             await sleep(animationSpeed);
-            
+
             arr[j + 1] = arr[j];
             j--;
         }
-        
+
+        // Final comparison that fails the while condition
+        if (j >= 0) {
+            algorithmStats.comparisons++;
+            updateStatsDisplay();
+        }
+
         arr[j + 1] = key;
-        displayArray(arr, [j + 1], [], Array.from({length: i + 1}, (_, k) => k));
+        displayArray(arr, [j + 1], [], Array.from({ length: i + 1 }, (_, k) => k), [], { [j + 1]: 'inserted' });
         addStep(`Inserted ${key} at position ${j + 1}`);
         await sleep(animationSpeed);
     }
-    
-    displayArray(arr, [], [], Array.from({length: n}, (_, k) => k));
+
+    displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
     addStep(`Insertion Sort completed! Array is sorted: [${arr}]`);
     showStatus('Insertion Sort completed successfully!', 'success');
     isAnimating = false;
@@ -228,27 +292,31 @@ async function startInsertionSort() {
 // Linear Search
 async function startLinearSearch() {
     if (isAnimating) return;
-    
+
     const target = document.getElementById('searchValue').value;
     if (!target) {
         showStatus('Please enter a value to search', 'error');
         return;
     }
-    
+
     isAnimating = true;
+    resetStats();
     const arr = [...currentArray];
     const targetNum = parseInt(target);
     clearSteps();
     addStep(`Starting Linear Search for value ${targetNum}`);
     addStep(`Array: [${arr}]`);
-    
+
     for (let i = 0; i < arr.length; i++) {
-        displayArray(arr, [i]);
+        algorithmStats.passes++; // Using passes as "Steps"
+        algorithmStats.comparisons++;
+        updateStatsDisplay();
+        displayArray(arr, [i], [], [], [], { [i]: 'i' });
         addStep(`Checking element at index ${i}: ${arr[i]}`);
         await sleep(animationSpeed);
-        
+
         if (arr[i] === targetNum) {
-            displayArray(arr, [], [i]);
+            displayArray(arr, [], [i], [], [], { [i]: 'Found!' });
             addStep(`✅ Found ${targetNum} at index ${i}!`);
             showStatus(`Found ${targetNum} at index ${i}`, 'success');
             isAnimating = false;
@@ -257,7 +325,7 @@ async function startLinearSearch() {
             addStep(`❌ ${arr[i]} ≠ ${targetNum}, moving to next element`);
         }
     }
-    
+
     addStep(`❌ Value ${targetNum} not found in array`);
     showStatus(`${targetNum} not found in array`, 'error');
     isAnimating = false;
@@ -266,32 +334,36 @@ async function startLinearSearch() {
 // Binary Search (requires sorted array)
 async function startBinarySearch() {
     if (isAnimating) return;
-    
+
     const target = document.getElementById('searchValue').value;
     if (!target) {
         showStatus('Please enter a value to search', 'error');
         return;
     }
-    
+
     isAnimating = true;
+    resetStats();
     const arr = [...currentArray].sort((a, b) => a - b);
     const targetNum = parseInt(target);
     clearSteps();
     addStep(`Starting Binary Search for value ${targetNum}`);
     addStep(`Sorted Array: [${arr}] (Binary search requires sorted array)`);
-    
+
     let left = 0;
     let right = arr.length - 1;
-    
+
     while (left <= right) {
+        algorithmStats.passes++; // Steps
+        algorithmStats.comparisons++;
+        updateStatsDisplay();
         const mid = Math.floor((left + right) / 2);
-        
-        displayArray(arr, [mid], [left, right]);
+
+        displayArray(arr, [mid], [left, right], [], [], { [left]: 'L', [right]: 'R', [mid]: 'Mid' });
         addStep(`Search range: [${left}..${right}], Mid index: ${mid}, Mid value: ${arr[mid]}`);
         await sleep(animationSpeed);
-        
+
         if (arr[mid] === targetNum) {
-            displayArray(arr, [], [mid]);
+            displayArray(arr, [], [mid], [], [], { [mid]: 'Found!' });
             addStep(`✅ Found ${targetNum} at index ${mid}!`);
             showStatus(`Found ${targetNum} at index ${mid}`, 'success');
             isAnimating = false;
@@ -303,10 +375,10 @@ async function startBinarySearch() {
             addStep(`${arr[mid]} > ${targetNum}, searching left half [${left}..${mid - 1}]`);
             right = mid - 1;
         }
-        
+
         await sleep(animationSpeed);
     }
-    
+
     addStep(`❌ Value ${targetNum} not found in array`);
     showStatus(`${targetNum} not found in array`, 'error');
     isAnimating = false;
@@ -361,46 +433,59 @@ let stack = new Stack();
 function displayStack() {
     const container = document.getElementById('structureDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     if (stack.isEmpty()) {
         container.innerHTML = '<div class="status-message status-info">Stack is empty</div>';
         return;
     }
-    
+
     // Display stack from top to bottom
     for (let i = stack.items.length - 1; i >= 0; i--) {
-        const element = document.createElement('div');
-        element.className = 'structure-element';
-        element.textContent = stack.items[i];
-        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'element-wrapper';
+
         if (i === stack.items.length - 1) {
-            element.classList.add('top');
-            element.innerHTML = `${stack.items[i]}<br><small>TOP</small>`;
+            const label = document.createElement('div');
+            label.className = 'element-label';
+            label.textContent = 'TOP';
+            wrapper.appendChild(label);
         }
-        
-        container.appendChild(element);
-        
+
+        const element = document.createElement('div');
+        element.className = 'array-element'; // Use same class for consistency
+        element.textContent = stack.items[i];
+
+        if (i === stack.items.length - 1) {
+            element.classList.add('active');
+        }
+
+        wrapper.appendChild(element);
+        container.appendChild(wrapper);
+
         // Add arrow between elements
         if (i > 0) {
             const arrow = document.createElement('div');
             arrow.textContent = '↓';
             arrow.style.fontSize = '24px';
-            arrow.style.color = '#666';
+            arrow.style.color = '#6c4ce0';
             arrow.style.margin = '5px 0';
+            arrow.style.fontWeight = 'bold';
             container.appendChild(arrow);
         }
     }
 }
 
 function pushToStack() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     const valueInput = document.getElementById('dsValue');
     if (!valueInput || !valueInput.value.trim()) {
         showStatus('Please enter a value', 'error');
         return;
     }
-    
+
     const value = valueInput.value.trim();
     if (stack.push(value)) {
         addStep(`Pushed ${value} to stack`);
@@ -413,11 +498,13 @@ function pushToStack() {
 }
 
 function popFromStack() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     if (stack.isEmpty()) {
         showStatus('Stack is empty!', 'error');
         return;
     }
-    
+
     const value = stack.pop();
     addStep(`Popped ${value} from stack`);
     displayStack();
@@ -481,92 +568,66 @@ let queue = new Queue();
 function displayLinearQueue() {
     const container = document.getElementById('structureDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     if (queue.isEmpty()) {
         container.innerHTML = '<div class="status-message status-info">Queue is empty</div>';
         return;
     }
-    
-    // Clear any existing classes
-    container.className = 'structure-container';
-    
-    // Create queue visualization container
+
     const queueVis = document.createElement('div');
-    queueVis.className = 'linked-list-container';
-    queueVis.style.display = 'flex';
-    queueVis.style.alignItems = 'center';
-    queueVis.style.justifyContent = 'center';
-    queueVis.style.flexWrap = 'wrap';
-    queueVis.style.gap = '20px';
-    queueVis.style.padding = '20px';
-    
+    queueVis.className = 'array-display';
+    queueVis.style.background = 'transparent';
+    queueVis.style.border = 'none';
+
     queue.items.forEach((item, index) => {
-        // Create node container
-        const node = document.createElement('div');
-        node.className = 'node';
-        node.style.display = 'flex';
-        node.style.flexDirection = 'column';
-        node.style.alignItems = 'center';
-        node.style.margin = '0 10px';
-        
-        // Create value box
-        const valueDiv = document.createElement('div');
-        valueDiv.className = 'node-value';
-        valueDiv.textContent = item;
-        valueDiv.style.width = '70px';
-        valueDiv.style.height = '70px';
-        valueDiv.style.background = 'linear-gradient(135deg, #6c4ce0, #0fb9b1)';
-        valueDiv.style.color = 'white';
-        valueDiv.style.display = 'flex';
-        valueDiv.style.alignItems = 'center';
-        valueDiv.style.justifyContent = 'center';
-        valueDiv.style.borderRadius = '8px';
-        valueDiv.style.fontWeight = 'bold';
-        valueDiv.style.fontSize = '20px';
-        valueDiv.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-        
-        // Mark front and rear
-        if (index === 0) {
-            valueDiv.style.background = 'linear-gradient(135deg, #ff6b6b, #ff8e53)';
-            valueDiv.innerHTML = `${item}<br><small style="font-size: 12px;">FRONT</small>`;
-        } else if (index === queue.items.length - 1) {
-            valueDiv.innerHTML = `${item}<br><small style="font-size: 12px;">REAR</small>`;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'element-wrapper';
+
+        let labelText = '';
+        if (index === 0) labelText = 'FRONT';
+        if (index === queue.items.length - 1) labelText = labelText ? 'FRONT & REAR' : 'REAR';
+
+        if (labelText) {
+            const label = document.createElement('div');
+            label.className = 'element-label';
+            label.textContent = labelText;
+            wrapper.appendChild(label);
         }
-        
-        // Create index label
-        const indexLabel = document.createElement('div');
-        indexLabel.textContent = `Index: ${index}`;
-        indexLabel.style.fontSize = '12px';
-        indexLabel.style.color = '#666';
-        indexLabel.style.marginTop = '5px';
-        
-        node.appendChild(valueDiv);
-        node.appendChild(indexLabel);
-        queueVis.appendChild(node);
-        
-        // Add arrow between elements (except after last)
+
+        const element = document.createElement('div');
+        element.className = 'array-element';
+        element.textContent = item;
+
+        if (index === 0) element.classList.add('active');
+
+        wrapper.appendChild(element);
+        queueVis.appendChild(wrapper);
+
         if (index < queue.items.length - 1) {
             const arrow = document.createElement('div');
             arrow.textContent = '→';
             arrow.style.fontSize = '24px';
-            arrow.style.color = '#666';
-            arrow.style.margin = '0 10px';
+            arrow.style.color = '#6c4ce0';
+            arrow.style.fontWeight = 'bold';
+            arrow.style.alignSelf = 'center';
             queueVis.appendChild(arrow);
         }
     });
-    
+
     container.appendChild(queueVis);
 }
 
 function enqueueToQueue() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     const valueInput = document.getElementById('dsValue');
     if (!valueInput || !valueInput.value.trim()) {
         showStatus('Please enter a value', 'error');
         return;
     }
-    
+
     const value = valueInput.value.trim();
     if (queue.enqueue(value)) {
         addStep(`Enqueued ${value} to queue`);
@@ -579,11 +640,13 @@ function enqueueToQueue() {
 }
 
 function dequeueFromQueue() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     if (queue.isEmpty()) {
         showStatus('Queue is empty!', 'error');
         return;
     }
-    
+
     const value = queue.dequeue();
     addStep(`Dequeued ${value} from queue`);
     displayLinearQueue();
@@ -684,51 +747,70 @@ let linkedList = new LinkedList();
 function displayLinkedList(highlightValue = null) {
     const container = document.getElementById('structureDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    container.className = 'linked-list-container';
-    
+
     if (linkedList.size === 0) {
         container.innerHTML = '<div class="status-message status-info">Linked List is empty</div>';
         return;
     }
-    
+
+    const listVis = document.createElement('div');
+    listVis.className = 'array-display';
+    listVis.style.background = 'transparent';
+    listVis.style.border = 'none';
+
     let current = linkedList.head;
     let index = 0;
-    
+
     while (current) {
-        const node = document.createElement('div');
-        node.className = 'node';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'element-wrapper';
+
+        if (index === 0) {
+            const label = document.createElement('div');
+            label.className = 'element-label';
+            label.textContent = 'HEAD';
+            wrapper.appendChild(label);
+        }
+
+        const element = document.createElement('div');
+        element.className = 'array-element';
+        element.textContent = current.value;
+
         if (current.value === highlightValue) {
-            node.classList.add('active');
+            element.classList.add('active');
         }
-        
-        const valueDiv = document.createElement('div');
-        valueDiv.className = 'node-value';
-        valueDiv.textContent = current.value;
-        node.appendChild(valueDiv);
-        container.appendChild(node);
-        
-        // Add arrow if not last node
+
+        wrapper.appendChild(element);
+        listVis.appendChild(wrapper);
+
         if (current.next) {
-            const arrow = document.createElement('span');
-            arrow.className = 'arrow';
+            const arrow = document.createElement('div');
             arrow.textContent = '→';
-            container.appendChild(arrow);
+            arrow.style.fontSize = '24px';
+            arrow.style.color = '#6c4ce0';
+            arrow.style.fontWeight = 'bold';
+            arrow.style.alignSelf = 'center';
+            listVis.appendChild(arrow);
         }
-        
+
         current = current.next;
         index++;
     }
+
+    container.appendChild(listVis);
 }
 
 function addToLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     const valueInput = document.getElementById('dsValue');
     if (!valueInput || !valueInput.value.trim()) {
         showStatus('Please enter a value', 'error');
         return;
     }
-    
+
     const value = valueInput.value.trim();
     if (linkedList.add(value)) {
         addStep(`Added ${value} to linked list`);
@@ -739,12 +821,14 @@ function addToLinkedList() {
 }
 
 function removeFromLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     const valueInput = document.getElementById('dsValue');
     if (!valueInput || !valueInput.value.trim()) {
         showStatus('Please enter a value to remove', 'error');
         return;
     }
-    
+
     const value = valueInput.value.trim();
     if (linkedList.remove(value)) {
         addStep(`Removed ${value} from linked list`);
@@ -757,15 +841,17 @@ function removeFromLinkedList() {
 }
 
 function searchInLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
     const valueInput = document.getElementById('dsValue');
     if (!valueInput || !valueInput.value.trim()) {
         showStatus('Please enter a value to search', 'error');
         return;
     }
-    
+
     const value = valueInput.value.trim();
     const index = linkedList.search(value);
-    
+
     if (index !== -1) {
         addStep(`Found ${value} at index ${index}`);
         displayLinkedList(value);
@@ -789,7 +875,7 @@ function generateNewArray() {
         showStatus('Please enter array size between 3 and 20', 'error');
         return;
     }
-    
+
     currentArray = generateArray(size);
     displayArray(currentArray);
     clearSteps();
@@ -807,6 +893,7 @@ function updateSpeed() {
 function resetVisualization() {
     isAnimating = false;
     clearSteps();
+    resetStats();
     generateNewArray();
     showStatus('Visualization reset', 'info');
 }
@@ -829,8 +916,8 @@ function showAlgorithm(algoType) {
     }
 
     let content = '';
-    
-    switch(algoType) {
+
+    switch (algoType) {
         case 'bubble':
             content = createSortingContent('Bubble Sort', 'bubble');
             break;
@@ -873,7 +960,7 @@ function showAlgorithm(algoType) {
     }
 
     container.innerHTML = content;
-    
+
     // Initialize display
     if (algoType === 'bubble' || algoType === 'selection' || algoType === 'insertion' || algoType === 'search') {
         displayArray(currentArray);
@@ -884,19 +971,19 @@ function showAlgorithm(algoType) {
     } else if (algoType === 'linkedlist') {
         displayLinkedList();
     }
-    
+
     // Add step-by-step output area
     const stepsDiv = document.createElement('div');
     stepsDiv.className = 'steps-container';
     stepsDiv.innerHTML = '<h4>Step-by-Step Execution:</h4><div id="stepsOutput"></div>';
     container.appendChild(stepsDiv);
-    
+
     // Add status message area
     const statusDiv = document.createElement('div');
     statusDiv.id = 'statusMessage';
     statusDiv.className = 'status-message status-info';
     container.appendChild(statusDiv);
-    
+
     // Initialize steps
     clearSteps();
 }
@@ -910,9 +997,22 @@ function createSortingContent(title, type) {
             <p><strong>Time Complexity:</strong> O(n²) worst and average case</p>
             <p><strong>Space Complexity:</strong> O(1)</p>
             <p><strong>Stability:</strong> ${type === 'bubble' || type === 'insertion' ? 'Stable' : 'Not stable'}</p>
-            <p><strong>Best for:</strong> ${type === 'bubble' ? 'Educational purposes, small datasets' : 
-                                           type === 'selection' ? 'Minimizing swaps, small datasets' : 
-                                           'Nearly sorted arrays, small datasets'}</p>
+            <p><strong>Best for:</strong> ${type === 'bubble' ? 'Educational purposes, small datasets' :
+            type === 'selection' ? 'Minimizing swaps, small datasets' :
+                'Nearly sorted arrays, small datasets'}</p>
+        </div>
+
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>${type === 'bubble' ? 'if (arr[j] > arr[j+1]) swap(arr[j], arr[j+1])' :
+            type === 'selection' ? 'if (arr[j] < arr[minIdx]) minIdx = j' :
+                'while (j >= 0 && arr[j] > key) arr[j+1] = arr[j]'}</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Passes:</strong> 0</span>
+            <span><strong>Comparisons:</strong> 0</span>
+            <span><strong>Swaps:</strong> 0</span>
         </div>
         
         <div class="array-container">
@@ -950,6 +1050,16 @@ function createSearchContent() {
             <h4>Available Algorithms:</h4>
             <p><strong>Linear Search:</strong> Checks each element sequentially. Time: O(n), Space: O(1)</p>
             <p><strong>Binary Search:</strong> Requires sorted array, divides search space in half. Time: O(log n), Space: O(1)</p>
+        </div>
+
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>Linear: if (arr[i] === target) | Binary: mid = (L + R) / 2</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Steps/Passes:</strong> 0</span>
+            <span><strong>Comparisons:</strong> 0</span>
         </div>
         
         <div class="array-container">
@@ -996,6 +1106,15 @@ function createStackContent() {
             <p><strong>isEmpty:</strong> Check if stack is empty</p>
             <p><strong>Max Size:</strong> 10 elements</p>
         </div>
+
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>Push: top++ | Pop: --top | LIFO</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Operations:</strong> 0</span>
+        </div>
         
         <div class="structure-container">
             <h4>Stack Visualization (Top to Bottom):</h4>
@@ -1031,6 +1150,15 @@ function createQueueContent() {
             <p><strong>isEmpty:</strong> Check if queue is empty</p>
             <p><strong>Max Size:</strong> 10 elements</p>
         </div>
+
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>Enqueue: rear++ | Dequeue: front++ | FIFO</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Operations:</strong> 0</span>
+        </div>
         
         <div class="structure-container">
             <h4>Queue Visualization (Front → Rear):</h4>
@@ -1064,6 +1192,15 @@ function createLinkedListContent() {
             <p><strong>Remove:</strong> Delete specific element from list</p>
             <p><strong>Search:</strong> Find element in list (returns index)</p>
             <p><strong>Size:</strong> Get number of elements in list</p>
+        </div>
+
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>newNode.next = curr.next; curr.next = newNode</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Operations:</strong> 0</span>
         </div>
         
         <div class="structure-container">
@@ -1150,7 +1287,7 @@ function insertionSort(arr) {
     return arr;
 }`
     };
-    
+
     return codes[type] || '';
 }
 
@@ -1404,39 +1541,45 @@ function insertBST() {
         logBST("Please enter a value");
         return;
     }
-    
+
     const values = input.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-    
+
+    resetStats();
     values.forEach(value => {
         bstRoot = insertBSTNode(bstRoot, value);
         logBST(`Inserted: ${value}`);
     });
-    
+
     updateBSTVisualization();
     document.getElementById('bstInput').value = '';
 }
 
 function insertBSTNode(node, value) {
     if (!node) return new BSTNode(value);
-    
+
+    algorithmStats.comparisons++;
+    algorithmStats.rotations++; // Steps
+    updateStatsDisplay();
+
     if (value < node.value) {
         node.left = insertBSTNode(node.left, value);
     } else if (value > node.value) {
         node.right = insertBSTNode(node.right, value);
     }
-    
+
     return node;
 }
 
 function searchBST() {
     const input = document.getElementById('bstInput').value;
     const value = parseInt(input);
-    
+
     if (isNaN(value)) {
         logBST("Please enter a valid number to search");
         return;
     }
-    
+
+    resetStats();
     highlightBSTSearch(value);
     logBST(`Searching for: ${value}`);
 }
@@ -1445,14 +1588,18 @@ function highlightBSTSearch(value) {
     clearBSTHighlights();
     let current = bstRoot;
     let found = false;
-    
+
     function search(node, parentDiv) {
         if (!node || !parentDiv) return;
-        
+
+        algorithmStats.rotations++; // Steps
+        algorithmStats.comparisons++;
+        updateStatsDisplay();
+
         const nodeDiv = parentDiv.querySelector(`[data-value="${node.value}"]`);
         if (nodeDiv) {
             nodeDiv.classList.add('searching');
-            
+
             setTimeout(() => {
                 if (node.value === value) {
                     nodeDiv.classList.remove('searching');
@@ -1461,7 +1608,7 @@ function highlightBSTSearch(value) {
                     found = true;
                 } else {
                     nodeDiv.classList.remove('searching');
-                    
+
                     if (value < node.value) {
                         search(node.left, nodeDiv.parentNode.querySelector('.left-child'));
                     } else {
@@ -1471,9 +1618,9 @@ function highlightBSTSearch(value) {
             }, bstSpeed);
         }
     }
-    
+
     search(current, document.getElementById('bstVisualization'));
-    
+
     setTimeout(() => {
         if (!found) {
             logBST(`${value} not found in BST`);
@@ -1526,14 +1673,14 @@ function postOrderTraversal(node, result) {
 function highlightTraversal(values, type) {
     clearBSTHighlights();
     let index = 0;
-    
+
     function highlightNext() {
         if (index >= values.length) return;
-        
+
         const nodeDiv = document.querySelector(`.tree-node[data-value="${values[index]}"]`);
         if (nodeDiv) {
             nodeDiv.classList.add('traversing');
-            
+
             setTimeout(() => {
                 nodeDiv.classList.remove('traversing');
                 nodeDiv.classList.add('visited');
@@ -1542,19 +1689,19 @@ function highlightTraversal(values, type) {
             }, bstSpeed);
         }
     }
-    
+
     highlightNext();
 }
 
 function deleteBST() {
     const input = document.getElementById('bstInput').value;
     const value = parseInt(input);
-    
+
     if (isNaN(value)) {
         logBST("Please enter a valid number to delete");
         return;
     }
-    
+
     bstRoot = deleteBSTNode(bstRoot, value);
     updateBSTVisualization();
     logBST(`Deleted: ${value}`);
@@ -1563,7 +1710,7 @@ function deleteBST() {
 
 function deleteBSTNode(node, value) {
     if (!node) return null;
-    
+
     if (value < node.value) {
         node.left = deleteBSTNode(node.left, value);
     } else if (value > node.value) {
@@ -1572,13 +1719,13 @@ function deleteBSTNode(node, value) {
         // Node found
         if (!node.left) return node.right;
         if (!node.right) return node.left;
-        
+
         // Node with two children
         const minRight = findMin(node.right);
         node.value = minRight.value;
         node.right = deleteBSTNode(node.right, minRight.value);
     }
-    
+
     return node;
 }
 
@@ -1600,27 +1747,28 @@ function updateBSTSpeed() {
 function updateBSTVisualization() {
     const container = document.getElementById('bstVisualization');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     if (!bstRoot) {
         container.innerHTML = '<p class="empty-tree">Tree is empty. Insert values to build BST.</p>';
         return;
     }
-    
+
     const treeHTML = createBSTHTML(bstRoot, 0);
     container.innerHTML = treeHTML;
 }
 
 function createBSTHTML(node, depth) {
     if (!node) return '';
-    
+
     const leftHTML = createBSTHTML(node.left, depth + 1);
     const rightHTML = createBSTHTML(node.right, depth + 1);
-    
+
     return `
         <div class="tree-level" data-depth="${depth}">
             <div class="tree-node" data-value="${node.value}">
+                ${node.label ? `<div class="element-label tree-label">${node.label}</div>` : ''}
                 <div class="node-value">${node.value}</div>
                 <div class="node-children">
                     ${node.left ? '<div class="left-child">' + leftHTML + '</div>' : ''}
@@ -1640,7 +1788,7 @@ function clearBSTHighlights() {
 function logBST(message) {
     const log = document.getElementById('bstLog');
     if (!log) return;
-    
+
     const step = document.createElement('div');
     step.className = 'step';
     step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
@@ -1653,7 +1801,7 @@ function showBST() {
     if (typeof addBackButton === 'function') {
         addBackButton();
     }
-    
+
     document.getElementById('algorithmContent').innerHTML = `
         <h3>Binary Search Tree (BST) Visualization</h3>
         
@@ -1670,6 +1818,16 @@ function showBST() {
             <input type="range" id="bstSpeed" min="100" max="2000" value="500" onchange="updateBSTSpeed()">
         </div>
         
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>Left < Root < Right</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Steps/Passes:</strong> 0</span>
+            <span><strong>Comparisons:</strong> 0</span>
+        </div>
+
         <div class="structure-container" id="bstContainer">
             <div id="bstVisualization" class="tree-container"></div>
         </div>
@@ -1697,7 +1855,7 @@ function showBST() {
             <pre><code>${getBSTCode()}</code></pre>
         </div>
     `;
-    
+
     initBST();
 }
 
@@ -1726,21 +1884,26 @@ function insertAVL() {
         logAVL("Please enter a value");
         return;
     }
-    
+
     const values = input.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-    
+
+    resetStats();
     values.forEach(value => {
         avlRoot = insertAVLNode(avlRoot, value);
         logAVL(`Inserted: ${value}`);
     });
-    
+
     updateAVLVisualization();
     document.getElementById('avlInput').value = '';
 }
 
 function insertAVLNode(node, value) {
     if (!node) return new AVLNode(value);
-    
+
+    algorithmStats.comparisons++;
+    algorithmStats.rotations++; // Using rotations for steps here too
+    updateStatsDisplay();
+
     if (value < node.value) {
         node.left = insertAVLNode(node.left, value);
     } else if (value > node.value) {
@@ -1748,40 +1911,40 @@ function insertAVLNode(node, value) {
     } else {
         return node; // No duplicates
     }
-    
+
     // Update height
     node.height = 1 + Math.max(getHeight(node.left), getHeight(node.right));
-    
+
     // Get balance factor
     const balance = getBalance(node);
-    
+
     // Perform rotations if needed
     // Left Left Case
     if (balance > 1 && value < node.left.value) {
         logAVL("Performing Right Rotation (LL Case)");
         return rightRotate(node);
     }
-    
+
     // Right Right Case
     if (balance < -1 && value > node.right.value) {
         logAVL("Performing Left Rotation (RR Case)");
         return leftRotate(node);
     }
-    
+
     // Left Right Case
     if (balance > 1 && value > node.left.value) {
         logAVL("Performing Left-Right Rotation (LR Case)");
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
-    
+
     // Right Left Case
     if (balance < -1 && value < node.right.value) {
         logAVL("Performing Right-Left Rotation (RL Case)");
         node.right = rightRotate(node.right);
         return leftRotate(node);
     }
-    
+
     return node;
 }
 
@@ -1794,32 +1957,36 @@ function getBalance(node) {
 }
 
 function leftRotate(x) {
+    algorithmStats.rotations++;
+    updateStatsDisplay();
     const y = x.right;
     const T2 = y.left;
-    
+
     // Perform rotation
     y.left = x;
     x.right = T2;
-    
+
     // Update heights
     x.height = 1 + Math.max(getHeight(x.left), getHeight(x.right));
     y.height = 1 + Math.max(getHeight(y.left), getHeight(y.right));
-    
+
     return y;
 }
 
 function rightRotate(y) {
+    algorithmStats.rotations++;
+    updateStatsDisplay();
     const x = y.left;
     const T2 = x.right;
-    
+
     // Perform rotation
     x.right = y;
     y.left = T2;
-    
+
     // Update heights
     y.height = 1 + Math.max(getHeight(y.left), getHeight(y.right));
     x.height = 1 + Math.max(getHeight(x.left), getHeight(x.right));
-    
+
     return x;
 }
 
@@ -1836,44 +2003,44 @@ function checkBalanceFactors() {
         logAVL("Tree is empty");
         return;
     }
-    
+
     function check(node) {
         if (!node) return;
-        
+
         const balance = getBalance(node);
         logAVL(`Node ${node.value}: Balance factor = ${balance} ${Math.abs(balance) > 1 ? '(UNBALANCED!)' : '(balanced)'}`);
-        
+
         check(node.left);
         check(node.right);
     }
-    
+
     check(avlRoot);
 }
 
 function updateAVLVisualization() {
     const container = document.getElementById('avlVisualization');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     if (!avlRoot) {
         container.innerHTML = '<p class="empty-tree">Tree is empty. Insert values to build AVL Tree.</p>';
         return;
     }
-    
+
     const treeHTML = createAVLHTML(avlRoot, 0);
     container.innerHTML = treeHTML;
 }
 
 function createAVLHTML(node, depth) {
     if (!node) return '';
-    
+
     const balance = getBalance(node);
     const leftHTML = createAVLHTML(node.left, depth + 1);
     const rightHTML = createAVLHTML(node.right, depth + 1);
-    
+
     const balanceClass = Math.abs(balance) > 1 ? 'unbalanced' : 'balanced';
-    
+
     return `
         <div class="tree-level" data-depth="${depth}">
             <div class="tree-node avl-node ${balanceClass}" data-value="${node.value}" data-balance="${balance}">
@@ -1893,7 +2060,7 @@ function createAVLHTML(node, depth) {
 function logAVL(message) {
     const log = document.getElementById('avlLog');
     if (!log) return;
-    
+
     const step = document.createElement('div');
     step.className = 'step';
     step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
@@ -1916,7 +2083,7 @@ function showAVL() {
     if (typeof addBackButton === 'function') {
         addBackButton();
     }
-    
+
     document.getElementById('algorithmContent').innerHTML = `
         <h3>AVL Tree Visualization</h3>
         
@@ -1933,6 +2100,16 @@ function showAVL() {
             <input type="range" id="avlSpeed" min="100" max="2000" value="500" onchange="updateAVLSpeed()">
         </div>
         
+        <div class="formula-section">
+            <h4>Key Logic / Formula:</h4>
+            <code>BF = h(L) - h(R) | |BF| ≤ 1</code>
+        </div>
+
+        <div id="algorithmStats" class="stats-panel">
+            <span><strong>Rotations:</strong> 0</span>
+            <span><strong>Comparisons:</strong> 0</span>
+        </div>
+
         <div class="structure-container" id="avlContainer">
             <div id="avlVisualization" class="tree-container"></div>
         </div>
@@ -1959,7 +2136,7 @@ function showAVL() {
             <pre><code>${getAVLCode()}</code></pre>
         </div>
     `;
-    
+
     initAVL();
 }
 
@@ -1969,7 +2146,7 @@ function showQueueSelection() {
     if (typeof addBackButton === 'function') {
         addBackButton();
     }
-    
+
     document.getElementById('algorithmContent').innerHTML = `
         <h3>Queue Types</h3>
         
@@ -2007,9 +2184,14 @@ function showLinearQueue() {
     if (queueBtn) {
         queueBtn.classList.add('active');
     }
-    
+
     // Show the linear queue visualization
     showAlgorithm('queue');
+
+    // Override back button to go to queue selection
+    if (typeof addBackButton === 'function') {
+        addBackButton(showQueueSelection);
+    }
 }
 
 // ==================== CIRCULAR QUEUE ====================
@@ -2024,9 +2206,9 @@ let queueSpeed = 500;
 function showCircularQueue() {
     currentAlgorithm = 'circularqueue';
     if (typeof addBackButton === 'function') {
-        addBackButton();
+        addBackButton(showQueueSelection);
     }
-    
+
     document.getElementById('algorithmContent').innerHTML = `
         <h3>Circular Queue Visualization</h3>
         
@@ -2136,21 +2318,21 @@ function showCircularQueue() {
             </code></pre>
         </div>
     `;
-    
+
     initCircularQueue();
 }
 
 function initCircularQueue() {
     const sizeInput = document.getElementById('queueSize').value;
     queueSize = parseInt(sizeInput) || 8;
-    
+
     if (queueSize < 3) queueSize = 3;
     if (queueSize > 15) queueSize = 15;
-    
+
     circularQueue = new Array(queueSize).fill(null);
     front = -1;
     rear = -1;
-    
+
     updateCircularQueueVisualization();
     updateCircularQueueStats();
     logQueue(`Circular Queue initialized with size ${queueSize}`);
@@ -2166,34 +2348,34 @@ function enqueueCircular() {
         logQueue("Please enter a value to enqueue");
         return;
     }
-    
+
     const value = parseInt(input);
     if (isNaN(value)) {
         logQueue("Please enter a valid number");
         return;
     }
-    
+
     if (isQueueFull()) {
         logQueue(`Queue Overflow! Cannot enqueue ${value} - Queue is full`);
         highlightQueueFull();
         return;
     }
-    
+
     // Visual feedback for enqueue
     highlightEnqueuePosition();
-    
+
     setTimeout(() => {
         if (front === -1) {
             front = 0;
         }
-        
+
         rear = (rear + 1) % queueSize;
         circularQueue[rear] = value;
-        
+
         updateCircularQueueVisualization();
         updateCircularQueueStats();
         logQueue(`Enqueued: ${value} at position ${rear}`);
-        
+
         // Clear input
         document.getElementById('queueInput').value = '';
     }, queueSpeed);
@@ -2205,13 +2387,13 @@ function dequeueCircular() {
         highlightQueueEmpty();
         return;
     }
-    
+
     // Visual feedback for dequeue
     highlightDequeuePosition();
-    
+
     setTimeout(() => {
         const value = circularQueue[front];
-        
+
         if (front === rear) {
             // Queue becomes empty
             circularQueue[front] = null;
@@ -2221,7 +2403,7 @@ function dequeueCircular() {
             circularQueue[front] = null;
             front = (front + 1) % queueSize;
         }
-        
+
         updateCircularQueueVisualization();
         updateCircularQueueStats();
         logQueue(`Dequeued: ${value} from position ${front === -1 ? 'N/A' : (front === 0 ? rear : (front - 1 + queueSize) % queueSize)}`);
@@ -2233,10 +2415,10 @@ function peekFrontCircular() {
         logQueue("Queue is empty! Cannot peek");
         return;
     }
-    
+
     highlightFrontPosition();
     logQueue(`Front element: ${circularQueue[front]} at position ${front}`);
-    
+
     setTimeout(() => {
         clearQueueHighlights();
     }, queueSpeed);
@@ -2247,10 +2429,10 @@ function peekRearCircular() {
         logQueue("Queue is empty! Cannot peek");
         return;
     }
-    
+
     highlightRearPosition();
     logQueue(`Rear element: ${circularQueue[rear]} at position ${rear}`);
-    
+
     setTimeout(() => {
         clearQueueHighlights();
     }, queueSpeed);
@@ -2263,7 +2445,7 @@ function checkEmptyCircular() {
     } else {
         logQueue("Queue is NOT empty");
     }
-    
+
     setTimeout(() => {
         clearQueueHighlights();
     }, queueSpeed * 2);
@@ -2276,7 +2458,7 @@ function checkFullCircular() {
     } else {
         logQueue("Queue is NOT full");
     }
-    
+
     setTimeout(() => {
         clearQueueHighlights();
     }, queueSpeed * 2);
@@ -2293,10 +2475,10 @@ function displayQueueCircular() {
         }
     }
     logQueue(`Queue elements: [${queueElements.join(', ') || 'Empty'}]`);
-    
+
     // Highlight all occupied positions
     highlightAllOccupiedPositions();
-    
+
     setTimeout(() => {
         clearQueueHighlights();
     }, queueSpeed * 3);
@@ -2320,12 +2502,12 @@ function updateCircularQueueStats() {
     const count = getQueueCount();
     const freeSpace = queueSize - count;
     const status = isQueueEmpty() ? 'Empty' : isQueueFull() ? 'Full' : 'Partially Full';
-    
+
     document.getElementById('queueSizeValue').textContent = queueSize;
     document.getElementById('queueCount').textContent = count;
     document.getElementById('queueStatus').textContent = status;
     document.getElementById('freeSpace').textContent = freeSpace;
-    
+
     // Update pointer values
     document.getElementById('frontIndex').textContent = front;
     document.getElementById('rearIndex').textContent = rear;
@@ -2334,58 +2516,58 @@ function updateCircularQueueStats() {
 function updateCircularQueueVisualization() {
     const container = document.getElementById('circularQueueVisualization');
     if (!container) return;
-    
+
     container.innerHTML = '';
     container.className = 'circular-queue-container';
-    
+
     // Create circular layout
     const centerX = 200;
     const centerY = 150;
     const radius = 120;
-    
+
     for (let i = 0; i < queueSize; i++) {
         const angle = (i * 2 * Math.PI) / queueSize - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
-        
+
         const cell = document.createElement('div');
         cell.className = 'queue-cell';
         cell.style.position = 'absolute';
         cell.style.left = `${x}px`;
         cell.style.top = `${y}px`;
         cell.style.transform = 'translate(-50%, -50%)';
-        
+
         // Add cell number
         const cellNumber = document.createElement('div');
         cellNumber.className = 'cell-number';
         cellNumber.textContent = i;
         cell.appendChild(cellNumber);
-        
+
         // Add cell value
         const cellValue = document.createElement('div');
         cellValue.className = 'cell-value';
         cellValue.textContent = circularQueue[i] !== null ? circularQueue[i] : '';
-        
+
         if (circularQueue[i] !== null) {
             cellValue.classList.add('occupied');
         }
-        
+
         if (i === front && front !== -1) {
             cellValue.classList.add('front-cell');
         }
-        
+
         if (i === rear && rear !== -1) {
             cellValue.classList.add('rear-cell');
         }
-        
+
         cell.appendChild(cellValue);
-        
+
         // Add arrows showing circular connection
         if (i < queueSize - 1) {
             const nextAngle = ((i + 1) * 2 * Math.PI) / queueSize - Math.PI / 2;
             const nextX = centerX + radius * Math.cos(nextAngle);
             const nextY = centerY + radius * Math.sin(nextAngle);
-            
+
             const arrow = document.createElement('div');
             arrow.className = 'queue-arrow';
             arrow.style.position = 'absolute';
@@ -2394,13 +2576,13 @@ function updateCircularQueueVisualization() {
             arrow.style.width = `${Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2))}px`;
             arrow.style.transform = `rotate(${Math.atan2(nextY - y, nextX - x)}rad)`;
             arrow.style.transformOrigin = '0 0';
-            
+
             container.appendChild(arrow);
         }
-        
+
         container.appendChild(cell);
     }
-    
+
     // Add last arrow from last to first if queue is not empty
     if (!isQueueEmpty() && rear !== front) {
         const lastAngle = ((queueSize - 1) * 2 * Math.PI) / queueSize - Math.PI / 2;
@@ -2409,7 +2591,7 @@ function updateCircularQueueVisualization() {
         const lastY = centerY + radius * Math.sin(lastAngle);
         const firstX = centerX + radius * Math.cos(firstAngle);
         const firstY = centerY + radius * Math.sin(firstAngle);
-        
+
         const arrow = document.createElement('div');
         arrow.className = 'queue-arrow circular-arrow';
         arrow.style.position = 'absolute';
@@ -2418,14 +2600,14 @@ function updateCircularQueueVisualization() {
         arrow.style.width = `${Math.sqrt(Math.pow(firstX - lastX, 2) + Math.pow(firstY - lastY, 2))}px`;
         arrow.style.transform = `rotate(${Math.atan2(firstY - lastY, firstX - lastX)}rad)`;
         arrow.style.transformOrigin = '0 0';
-        
+
         container.appendChild(arrow);
     }
 }
 
 function highlightEnqueuePosition() {
     clearQueueHighlights();
-    
+
     if (isQueueEmpty()) {
         // First element - position 0
         setTimeout(() => {
@@ -2447,7 +2629,7 @@ function highlightEnqueuePosition() {
 
 function highlightDequeuePosition() {
     clearQueueHighlights();
-    
+
     setTimeout(() => {
         const cells = document.querySelectorAll('.queue-cell');
         if (cells[front]) {
@@ -2458,7 +2640,7 @@ function highlightDequeuePosition() {
 
 function highlightFrontPosition() {
     clearQueueHighlights();
-    
+
     setTimeout(() => {
         const cells = document.querySelectorAll('.queue-cell');
         if (cells[front]) {
@@ -2469,7 +2651,7 @@ function highlightFrontPosition() {
 
 function highlightRearPosition() {
     clearQueueHighlights();
-    
+
     setTimeout(() => {
         const cells = document.querySelectorAll('.queue-cell');
         if (cells[rear]) {
@@ -2494,14 +2676,14 @@ function highlightQueueFull() {
 
 function highlightAllOccupiedPositions() {
     if (isQueueEmpty()) return;
-    
+
     let i = front;
     while (true) {
         const cells = document.querySelectorAll('.queue-cell');
         if (cells[i]) {
             cells[i].classList.add('highlight-occupied');
         }
-        
+
         if (i === rear) break;
         i = (i + 1) % queueSize;
     }
@@ -2512,10 +2694,10 @@ function clearQueueHighlights() {
     if (container) {
         container.classList.remove('queue-empty', 'queue-full');
     }
-    
+
     document.querySelectorAll('.queue-cell').forEach(cell => {
-        cell.classList.remove('highlight-enqueue', 'highlight-dequeue', 'highlight-front', 
-                              'highlight-rear', 'highlight-occupied');
+        cell.classList.remove('highlight-enqueue', 'highlight-dequeue', 'highlight-front',
+            'highlight-rear', 'highlight-occupied');
     });
 }
 
@@ -2531,7 +2713,7 @@ function resetCircularQueue() {
 function logQueue(message) {
     const log = document.getElementById('queueLog');
     if (!log) return;
-    
+
     const step = document.createElement('div');
     step.className = 'step';
     step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
@@ -2544,12 +2726,12 @@ function logQueue(message) {
 function deleteAVL() {
     const input = document.getElementById('avlInput').value;
     const value = parseInt(input);
-    
+
     if (isNaN(value)) {
         logAVL("Please enter a valid number to delete");
         return;
     }
-    
+
     avlRoot = deleteAVLNode(avlRoot, value);
     updateAVLVisualization();
     logAVL(`Deleted: ${value}`);
@@ -2558,7 +2740,7 @@ function deleteAVL() {
 
 function deleteAVLNode(node, value) {
     if (!node) return null;
-    
+
     if (value < node.value) {
         node.left = deleteAVLNode(node.left, value);
     } else if (value > node.value) {
@@ -2567,46 +2749,46 @@ function deleteAVLNode(node, value) {
         // Node found
         if (!node.left) return node.right;
         if (!node.right) return node.left;
-        
+
         // Node with two children
         const minRight = findMinAVL(node.right);
         node.value = minRight.value;
         node.right = deleteAVLNode(node.right, minRight.value);
     }
-    
+
     // Update height
     node.height = 1 + Math.max(getHeight(node.left), getHeight(node.right));
-    
+
     // Get balance factor
     const balance = getBalance(node);
-    
+
     // Perform rotations if needed
     // Left Left Case
     if (balance > 1 && getBalance(node.left) >= 0) {
         logAVL("Performing Right Rotation after deletion (LL Case)");
         return rightRotate(node);
     }
-    
+
     // Left Right Case
     if (balance > 1 && getBalance(node.left) < 0) {
         logAVL("Performing Left-Right Rotation after deletion (LR Case)");
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
-    
+
     // Right Right Case
     if (balance < -1 && getBalance(node.right) <= 0) {
         logAVL("Performing Left Rotation after deletion (RR Case)");
         return leftRotate(node);
     }
-    
+
     // Right Left Case
     if (balance < -1 && getBalance(node.right) > 0) {
         logAVL("Performing Right-Left Rotation after deletion (RL Case)");
         node.right = rightRotate(node.right);
         return leftRotate(node);
     }
-    
+
     return node;
 }
 
@@ -2724,6 +2906,7 @@ class BSTNode {
         this.value = value;
         this.left = null;
         this.right = null;
+        this.label = '';
     }
 }
 
@@ -2765,17 +2948,17 @@ function inOrderTraversal(root) {
 // ==================== INITIALIZATION ====================
 
 // Initialize when page loads
-window.onload = function() {
+window.onload = function () {
     // Generate initial array
     currentArray = generateArray(8);
     displayArray(currentArray);
-    
+
     // Set up speed control
     updateSpeed();
-    
+
     // Show default algorithm
     showAlgorithm('bubble');
-    
+
     // Initialize data structures
     displayStack();
     displayLinkedList();

@@ -1,16 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Check if user is logged in
-    fetch('check_auth.php')
+    fetch('http://localhost/myproject/check_auth.php')
         .then(response => response.json())
         .then(data => {
             if (!data.logged_in) {
                 window.location.href = 'login.html';
                 return;
             }
-            // Update welcome message
-            const welcomeMsg = document.getElementById('welcomeMsg');
-            if (welcomeMsg && data.user) {
-                welcomeMsg.textContent = `Welcome to DSA Visualizer, ${data.user.name}!`;
+            // Update welcome message and profile pic
+            if (data.user) {
+                const welcomeMsg = document.getElementById('welcomeMsg');
+                if (welcomeMsg) {
+                    welcomeMsg.textContent = `Welcome to DSA Visualizer, ${data.user.name}!`;
+                }
+
+                const globalPic = document.getElementById('globalProfilePic');
+                if (globalPic && data.user.profile_pic) {
+                    const picPath = data.user.profile_pic === 'default.png' ? 'https://via.placeholder.com/40' : 'uploads/' + data.user.profile_pic;
+                    globalPic.src = picPath;
+                }
             }
         })
         .catch(error => {
@@ -18,14 +26,64 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function (e) {
-        e.preventDefault();
-        fetch('logout.php')
+    const logoutHandler = function (e) {
+        if (e) e.preventDefault();
+        fetch('http://localhost/myproject/logout.php')
             .then(response => response.json())
             .then(data => {
-                if (data.success) window.location.href = 'login.html';
+                if (data.success) {
+                    window.location.href = 'http://localhost/myproject/login.html';
+                } else {
+                    alert('Logout failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                // Fallback redirect if server is unreachable
+                window.location.href = 'http://localhost/myproject/login.html';
             });
-    });
+    };
+
+    document.getElementById('logoutBtn').addEventListener('click', logoutHandler);
+
+    const sidebarLogout = document.getElementById('sidebarLogout');
+    if (sidebarLogout) {
+        sidebarLogout.addEventListener('click', logoutHandler);
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById('algoSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const buttons = document.querySelectorAll('.dsa-btn');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+
+            // Show/hide clear icon
+            if (clearBtn) {
+                clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+            }
+
+            buttons.forEach(btn => {
+                const text = btn.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    btn.style.display = 'block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            buttons.forEach(btn => btn.style.display = 'block');
+            searchInput.focus();
+        });
+    }
 
     // Add event listeners to DSA buttons with data-algo attribute
     document.querySelectorAll('.dsa-btn[data-algo]').forEach(button => {
@@ -38,17 +96,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Special handler for Queue button
     const queueBtn = document.querySelector('.dsa-btn[onclick="loadQueueSelection()"]');
     if (queueBtn) {
-        queueBtn.addEventListener('click', function() {
+        queueBtn.addEventListener('click', function () {
             loadQueueSelection();
         });
     }
-
-    // Load default algorithm (Bubble Sort)
-    loadAlgorithm('bubble');
 });
 
 // Function to load algorithm
 function loadAlgorithm(algoType) {
+    // Hide home view and show visualization view
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('visualizationView').style.display = 'block';
+
     // Update active button
     document.querySelectorAll('.dsa-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -75,13 +134,18 @@ function loadAlgorithm(algoType) {
 
 // Function to load queue selection
 function loadQueueSelection() {
+    // Hide home view and show visualization view
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('visualizationView').style.display = 'block';
+
     // Update active button
     document.querySelectorAll('.dsa-btn').forEach(btn => {
         btn.classList.remove('active');
     });
 
     // Activate Queue button
-    const queueBtn = document.querySelector('.dsa-btn[onclick="loadQueueSelection()"]');
+    const queueBtn = document.querySelector('.dsa-btn[data-algo="queue"]') ||
+        Array.from(document.querySelectorAll('.dsa-btn')).find(b => b.textContent.includes('Queue'));
     if (queueBtn) {
         queueBtn.classList.add('active');
     }
@@ -100,49 +164,33 @@ function loadQueueSelection() {
 
 // Function to go back to main menu
 function goBackToMenu() {
+    // Show home view and hide visualization view
+    document.getElementById('homeView').style.display = 'block';
+    document.getElementById('visualizationView').style.display = 'none';
+
     // Update active button - remove active from all
     document.querySelectorAll('.dsa-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
+
     // Show default view
-    document.getElementById('algorithmContent').innerHTML = `
-        <h3>Select an Algorithm</h3>
-        <p>Choose an algorithm from the buttons above to visualize its working.</p>
-        <div class="info-panel">
-            <h4>How to use:</h4>
-            <p>1. Click any algorithm button</p>
-            <p>2. Generate or enter array elements</p>
-            <p>3. Use controls to visualize step-by-step</p>
-            <p>4. Watch the steps in the output panel</p>
-        </div>
-    `;
-    
+    document.getElementById('algorithmContent').innerHTML = '';
+
     // Remove back button
     removeBackButton();
 }
 
 // Function to add back button to header
-function addBackButton() {
-    const header = document.querySelector('header');
-    if (!header) return;
-    
-    // Check if back button already exists
-    if (document.getElementById('backBtn')) return;
-    
-    // Create back button
-    const backBtn = document.createElement('button');
-    backBtn.id = 'backBtn';
-    backBtn.className = 'back-btn';
-    backBtn.innerHTML = '← Back to Menu';
-    backBtn.onclick = goBackToMenu;
-    
-    // Insert back button before logout button
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        header.insertBefore(backBtn, logoutBtn);
-    } else {
-        header.appendChild(backBtn);
+// Function to add back button
+function addBackButton(customHandler = null) {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.style.display = 'flex';
+        if (customHandler) {
+            backBtn.onclick = customHandler;
+        } else {
+            backBtn.onclick = goBackToMenu;
+        }
     }
 }
 
@@ -150,7 +198,7 @@ function addBackButton() {
 function removeBackButton() {
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
-        backBtn.remove();
+        backBtn.style.display = 'none';
     }
 }
 

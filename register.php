@@ -10,13 +10,21 @@ header('Content-Type: application/json');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Headers: Content-Type");
     http_response_code(200);
     exit;
 }
 
 require_once 'config.php';
 
-$input = json_decode(file_get_contents('php://input'), true);
+// Support both JSON and Form Data
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+if (strpos($contentType, 'application/json') !== false) {
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+} else {
+    $input = $_POST;
+}
 
 $name = trim($input['name'] ?? '');
 $email = trim($input['email'] ?? '');
@@ -36,8 +44,33 @@ if (empty($dob)) $errors['dob'] = 'Date of birth is required';
 if (strlen($password) < 6) $errors['password'] = 'Password must be at least 6 characters';
 
 if (!empty($errors)) {
+    @ob_clean();
     echo json_encode(['success' => false, 'errors' => $errors]);
     exit;
+}
+
+// Handle Profile Picture Upload
+$profilePicName = 'default.png';
+if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+    $uploadDir = 'uploads/';
+    if (!is_dir($uploadDir)) {
+        @mkdir($uploadDir, 0777, true);
+    }
+    
+    $fileTmpPath = $_FILES['profile_pic']['tmp_name'];
+    $fileName = $_FILES['profile_pic']['name'];
+    $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    
+    // Generate unique name
+    $newFileName = uniqid('profile_', true) . '.' . $fileExtension;
+    $destPath = $uploadDir . $newFileName;
+    
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    if (in_array($fileExtension, $allowedExtensions)) {
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $profilePicName = $newFileName;
+        }
+    }
 }
 
 try {
@@ -54,11 +87,13 @@ try {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     
     // Insert user
-    $stmt = $pdo->prepare("INSERT INTO users (name, email, cnic, phone, dob, password) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$name, $email, $cnic, $phone, $dob, $hashedPassword]);
+    $stmt = $pdo->prepare("INSERT INTO users (name, email, cnic, phone, dob, password, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$name, $email, $cnic, $phone, $dob, $hashedPassword, $profilePicName]);
     
+    @ob_clean();
     echo json_encode(['success' => true, 'message' => 'Registration successful!']);
     
 } catch(PDOException $e) {
+    @ob_clean();
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }

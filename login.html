@@ -1,80 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login & Register - DSA Visualizer</title>
     <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
+
 <body>
     <div class="container">
-        <!-- LOGIN FORM -->
         <form id="loginForm" class="form active">
-            <h2>Welcome Back!</h2>
-            
-            <div class="input-group">
-                <input type="email" id="loginEmail" placeholder="Email Address" required>
-                <button type="button" class="toggle-password" data-target="loginEmail" style="display: none;">📧</button>
+            <h2>Login</h2>
+
+            <div class="field-container">
+                <label class="field-label">Username</label>
+                <div class="input-with-icon">
+                    <span class="icon">👤</span>
+                    <input type="email" id="loginEmail" placeholder="Type your username" required>
+                </div>
+                <small class="error" id="loginEmailError"></small>
             </div>
-            <small class="error" id="loginEmailError"></small>
-            
-            <div class="input-group">
-                <input type="password" id="loginPassword" placeholder="Password" required minlength="6">
-                <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
+
+            <div class="field-container">
+                <label class="field-label">Password</label>
+                <div class="input-with-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="loginPassword" placeholder="Type your password" required minlength="6">
+                    <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
+                </div>
+                <small class="error" id="loginPasswordError"></small>
             </div>
-            <small class="error" id="loginPasswordError"></small>
-            
-            <button type="submit">Login</button>
-            <p>New to DSA Visualizer? <a href="#" id="showRegister">Create Account</a></p>
+
+            <button type="submit" class="pill-btn">LOGIN</button>
+
+            <div class="signup-link">
+                <p>Or Sign Up Using</p>
+                <a href="#" id="showRegister">SIGN UP</a>
+            </div>
         </form>
-        
-        <!-- REGISTER FORM -->
+
         <form id="registerForm" class="form">
-            <h2>Create Account</h2>
-            
-            <div class="input-group">
-                <input type="text" id="regName" placeholder="Full Name" required minlength="3">
+            <h2>Sign Up</h2>
+
+            <div class="field-container">
+                <label class="field-label">Full Name</label>
+                <div class="input-with-icon">
+                    <span class="icon">👤</span>
+                    <input type="text" id="regName" placeholder="Type your name" required minlength="3">
+                </div>
+                <small class="error" id="regNameError"></small>
             </div>
-            <small class="error" id="regNameError"></small>
-            
-            <div class="input-group">
-                <input type="email" id="regEmail" placeholder="Email Address" required>
+
+            <div class="field-container">
+                <label class="field-label">Email</label>
+                <div class="input-with-icon">
+                    <span class="icon">📧</span>
+                    <input type="email" id="regEmail" placeholder="Type your email" required>
+                </div>
+                <small class="error" id="regEmailError"></small>
             </div>
-            <small class="error" id="regEmailError"></small>
-            
-            <div class="input-group">
-                <input type="text" id="regCNIC" placeholder="CNIC (12345-1234567-1)" required>
+
+            <div class="field-container">
+                <label class="field-label">CNIC</label>
+                <div class="input-with-icon">
+                    <span class="icon">🆔</span>
+                    <input type="text" id="regCNIC" placeholder="12345-1234567-1" required>
+                </div>
+                <small class="error" id="regCNICError"></small>
             </div>
-            <small class="error" id="regCNICError"></small>
-            
-            <div class="input-group">
-                <input type="text" id="regPhone" placeholder="Phone (03xx-xxxxxxx)" required>
+
+            <div class="field-container">
+                <label class="field-label">Phone</label>
+                <div class="input-with-icon">
+                    <span class="icon">📱</span>
+                    <input type="text" id="regPhone" placeholder="03xx-xxxxxxx" required>
+                </div>
+                <small class="error" id="regPhoneError"></small>
             </div>
-            <small class="error" id="regPhoneError"></small>
-            
-            <div class="input-group">
-                <input type="date" id="regDOB" required>
-                <small style="display: block; margin-top: 5px; color: #666; font-size: 12px;">You must be at least 13 years old</small>
+
+            <div class="field-container">
+                <label class="field-label" for="regDOB">Date of Birth</label>
+                <div class="input-with-icon">
+                    <span class="icon">📅</span>
+                    <input type="date" id="regDOB" required aria-label="Date of Birth">
+                </div>
+                <small class="error" id="regDOBError"></small>
             </div>
-            <small class="error" id="regDOBError"></small>
-            
-            <div class="input-group">
-                <input type="password" id="regPassword" placeholder="Password (min 6 characters)" required minlength="6">
-                <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
+
+            <div class="field-container">
+                <label class="field-label">Password</label>
+                <div class="input-with-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="regPassword" placeholder="Type your password" required minlength="6">
+                    <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
+                </div>
+                <small class="error" id="regPasswordError"></small>
             </div>
-            <small class="error" id="regPasswordError"></small>
-            
-            <div class="input-group">
-                <input type="password" id="regConfirmPassword" placeholder="Confirm Password" required minlength="6">
-                <button type="button" class="toggle-password" data-target="regConfirmPassword">👁️</button>
+
+            <div class="field-container">
+                <label class="field-label">Confirm Password</label>
+                <div class="input-with-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required
+                        minlength="6">
+                    <button type="button" class="toggle-password" data-target="regConfirmPassword">👁️</button>
+                </div>
+                <small class="error" id="regConfirmPasswordError"></small>
             </div>
-            <small class="error" id="regConfirmPasswordError"></small>
-            
-            <button type="submit">Create Account</button>
+
+            <div class="field-container">
+                <label class="field-label" for="regProfilePic">Profile Picture</label>
+                <div class="input-with-icon">
+                    <span class="icon">📸</span>
+                    <input type="file" id="regProfilePic" accept="image/*" aria-label="Profile Picture">
+                </div>
+                <small class="error" id="regProfilePicError"></small>
+            </div>
+
+            <button type="submit" class="pill-btn">REGISTER</button>
             <p>Already have an account? <a href="#" id="showLogin">Login Here</a></p>
         </form>
     </div>
-    
+
     <script src="login.js"></script>
 </body>
+
 </html>

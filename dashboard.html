@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSA Visualizer</title>
     <link rel="stylesheet" href="dashboard.css">
 </head>
-<body>
+
+<body class="has-sidebar">
     <div class="dashboard-container">
+        <button id="backBtn" class="back-btn" style="display: none;" onclick="goBackToMenu()">← Back to Menu</button>
         <aside class="sidebar">
             <h2>DSA Visualizer</h2>
             <nav>
                 <ul>
-                    <li><a href="#"><span>🏠</span> Home</a></li>
-                    <li><a href="#"><span>📚</span> Algorithms</a></li>
-                    <li><a href="#"><span>🏗️</span> Data Structures</a></li>
+                    <li><a href="dashboard.html"><span>🏠</span> Home</a></li>
+                    <li><a href="profile.html"><span>👤</span> Profile</a></li>
                     <li><a href="#"><span>⚙️</span> Settings</a></li>
+                    <li><a href="#" id="sidebarLogout"><span>🚪</span> Logout</a></li>
                 </ul>
             </nav>
         </aside>
@@ -25,14 +28,24 @@
                 <div class="welcome">
                     <h1 id="welcomeMsg">Welcome to DSA Visualizer</h1>
                 </div>
-                <!-- Change your button in dashboard.html to: -->
-<button id="logoutBtn" onclick="window.location.href='login.html'">Logout</button>
-      </header>
+                <div class="header-actions">
+                    <img id="globalProfilePic" class="global-profile-pic" src="https://via.placeholder.com/40"
+                        alt="Profile" onclick="window.location.href='profile.html'">
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </header>
 
-            <section class="dsa-section">
+            <section class="dsa-section" id="homeView">
                 <h2>Data Structures & Algorithms Visualizer</h2>
-                
-                <div class="dsa-buttons">
+
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="algoSearch" placeholder="Search algorithms (e.g. Bubble Sort, Stack)...">
+                        <span id="clearSearch" class="clear-icon">&times;</span>
+                    </div>
+                </div>
+
+                <div class="dsa-buttons" id="algoButtonsContainer">
                     <button class="dsa-btn" data-algo="bubble">Bubble Sort</button>
                     <button class="dsa-btn" data-algo="selection">Selection Sort</button>
                     <button class="dsa-btn" data-algo="insertion">Insertion Sort</button>
@@ -43,18 +56,11 @@
                     <button class="dsa-btn" data-algo="bst">Binary Search Tree</button>
                     <button class="dsa-btn" data-algo="avl">AVL Tree</button>
                 </div>
+            </section>
 
+            <section id="visualizationView" style="display: none;">
                 <div id="algorithmContent" class="visualization-container">
                     <!-- Content loaded by JavaScript -->
-                    <h3>Select an Algorithm</h3>
-                    <p>Choose an algorithm from the buttons above to visualize its working.</p>
-                    <div class="info-panel">
-                        <h4>How to use:</h4>
-                        <p>1. Click any algorithm button</p>
-                        <p>2. Generate or enter array elements</p>
-                        <p>3. Use controls to visualize step-by-step</p>
-                        <p>4. Watch the steps in the output panel</p>
-                    </div>
                 </div>
             </section>
         </main>
@@ -63,4 +69,5 @@
     <script src="dashboard.js"></script>
     <script src="algorithms.js"></script>
 </body>
+
 </html>

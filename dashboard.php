@@ -12,10 +12,11 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="dashboard.css">
     <style>
         .dashboard-container {
             max-width: 600px;
-            margin: 50px auto;
+            margin: 100px auto 50px auto;
             padding: 40px;
             background: white;
             border-radius: 14px;
@@ -62,6 +63,7 @@ if (!isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back Home</button>
     <div class="dashboard-container">
         <h1>Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h1>
         
