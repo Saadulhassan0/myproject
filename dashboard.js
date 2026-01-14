@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Check if user is logged in
-    fetch('http://localhost/myproject/check_auth.php')
+    fetch('check_auth.php')
         .then(response => response.json())
         .then(data => {
             if (!data.logged_in) {
@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Logout functionality
     const logoutHandler = function (e) {
         if (e) e.preventDefault();
-        fetch('http://localhost/myproject/logout.php')
+        fetch('logout.php')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = 'http://localhost/myproject/login.html';
+                    window.location.href = 'login.html';
                 } else {
                     alert('Logout failed: ' + data.message);
                 }
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => {
                 console.error('Logout error:', error);
                 // Fallback redirect if server is unreachable
-                window.location.href = 'http://localhost/myproject/login.html';
+                window.location.href = 'login.html';
             });
     };
 

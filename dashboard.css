@@ -767,7 +767,23 @@ body:not(.has-sidebar) .back-btn {
     .main-content {
         margin-left: 70px;
         width: calc(100% - 70px);
-        padding: 20px;
+        padding: 15px;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding-top: 80px;
+    }
+
+    header h1 {
+        font-size: 20px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .dsa-buttons {
@@ -776,6 +792,7 @@ body:not(.has-sidebar) .back-btn {
 
     .dsa-btn {
         width: 100%;
+        min-width: unset;
     }
 
     .input-group {
@@ -797,8 +814,48 @@ body:not(.has-sidebar) .back-btn {
     }
 
     .back-btn {
-        width: 100%;
-        margin-bottom: 10px;
+        position: absolute;
+        left: 85px;
+        top: 20px;
+        width: auto;
+    }
+
+    .visualization-container {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    .array-display {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .array-element {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 50px;
+        padding: 15px 5px;
+    }
+
+    .main-content {
+        margin-left: 50px;
+        width: calc(100% - 50px);
+    }
+
+    .back-btn {
+        left: 65px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .sidebar h2::after {
+        font-size: 16px;
     }
 }
 

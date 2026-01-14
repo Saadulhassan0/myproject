@@ -64,6 +64,24 @@
             font-size: 18px;
             color: #333;
         }
+
+        /* Mobile Profile Fixes */
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 
@@ -138,7 +156,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Check auth and load user data
-            fetch('http://localhost/myproject/check_auth.php')
+            fetch('check_auth.php')
                 .then(response => response.json())
                 .then(data => {
                     if (!data.logged_in) {
@@ -173,18 +191,18 @@
             // Logout
             const logoutHandler = function (e) {
                 if (e) e.preventDefault();
-                fetch('http://localhost/myproject/logout.php')
+                fetch('logout.php')
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            window.location.href = 'http://localhost/myproject/login.html';
+                            window.location.href = 'login.html';
                         } else {
                             alert('Logout failed: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Logout error:', error);
-                        window.location.href = 'http://localhost/myproject/login.html';
+                        window.location.href = 'login.html';
                     });
             };
             document.getElementById('logoutBtn').addEventListener('click', logoutHandler);
