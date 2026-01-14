@@ -10,8 +10,7 @@
 
 <body class="has-sidebar">
     <div class="dashboard-container">
-        <button id="backBtn" class="back-btn" style="display: none;" onclick="goBackToMenu()">← Back to Menu</button>
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <h2>DSA Visualizer</h2>
             <nav>
                 <ul>
@@ -24,6 +23,8 @@
         </aside>
 
         <main class="main-content">
+            <button id="backBtn" class="back-btn" style="display: none;" onclick="goBackToMenu()">← Back to
+                Menu</button>
             <header>
                 <div class="welcome">
                     <h1 id="welcomeMsg">Welcome to DSA Visualizer</h1>
@@ -51,7 +52,7 @@
                     <button class="dsa-btn" data-algo="insertion">Insertion Sort</button>
                     <button class="dsa-btn" data-algo="search">Searching</button>
                     <button class="dsa-btn" data-algo="stack">Stack</button>
-                    <button class="dsa-btn" onclick="loadQueueSelection()">Queue</button>
+                    <button class="dsa-btn" data-algo="queue">Queue</button>
                     <button class="dsa-btn" data-algo="linkedlist">Linked List</button>
                     <button class="dsa-btn" data-algo="bst">Binary Search Tree</button>
                     <button class="dsa-btn" data-algo="avl">AVL Tree</button>

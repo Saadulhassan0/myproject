@@ -102,6 +102,17 @@ function updateStepsDisplay() {
     stepsContainer.scrollTop = stepsContainer.scrollHeight;
 }
 
+// ==================== RESIZE LISTENER ====================
+window.addEventListener('resize', () => {
+    if (currentAlgorithm === 'circularqueue') {
+        updateCircularQueueVisualization();
+    } else if (currentAlgorithm === 'bst') {
+        updateBSTVisualization();
+    } else if (currentAlgorithm === 'avl') {
+        updateAVLVisualization();
+    }
+});
+
 function clearSteps() {
     steps = [];
     currentStep = 0;
