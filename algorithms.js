@@ -113,6 +113,26 @@ window.addEventListener('resize', () => {
     }
 });
 
+// ==================== FAB RESET FUNCTION ====================
+function resetVisualization() {
+    if (currentAlgorithm === 'bubble' || currentAlgorithm === 'selection' || currentAlgorithm === 'insertion') {
+        generateArray();
+    } else if (currentAlgorithm === 'search') {
+        generateSearchArray();
+    } else if (currentAlgorithm === 'stack') {
+        resetStack();
+    } else if (currentAlgorithm === 'queue') {
+        if (typeof resetCircularQueue === 'function') resetCircularQueue();
+        else resetQueue();
+    } else if (currentAlgorithm === 'linkedlist') {
+        resetLinkedList();
+    } else if (currentAlgorithm === 'bst') {
+        resetBST();
+    } else if (currentAlgorithm === 'avl') {
+        resetAVL();
+    }
+}
+
 function clearSteps() {
     steps = [];
     currentStep = 0;
