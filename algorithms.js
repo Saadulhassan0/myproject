@@ -2521,9 +2521,10 @@ function updateCircularQueueVisualization() {
     container.className = 'circular-queue-container';
 
     // Create circular layout
-    const centerX = 200;
+    const containerWidth = container.offsetWidth || 400;
+    const centerX = containerWidth / 2;
     const centerY = 150;
-    const radius = 120;
+    const radius = Math.min(containerWidth / 2 - 40, 120);
 
     for (let i = 0; i < queueSize; i++) {
         const angle = (i * 2 * Math.PI) / queueSize - Math.PI / 2;
