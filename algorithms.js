@@ -1,10 +1,12 @@
 // ==================== GLOBAL VARIABLES ====================
 let currentArray = [];
 let isAnimating = false;
+let isPaused = false;
 let animationSpeed = 800;
 let steps = [];
 let currentStep = 0;
 let currentAlgorithm = 'bubble';
+let currentRunId = 0;
 
 // ==================== STATS TRACKING ====================
 let algorithmStats = {
@@ -152,7 +154,10 @@ function showStatus(message, type = 'info') {
 // Bubble Sort with step-by-step
 async function startBubbleSort() {
     if (isAnimating) return;
+    currentRunId++;
+    const runId = currentRunId;
     isAnimating = true;
+    isPaused = false;
     resetStats();
 
     const arr = [...currentArray];
@@ -171,7 +176,7 @@ async function startBubbleSort() {
             // Show comparison
             displayArray(arr, [], [j, j + 1], Array.from({ length: i }, (_, k) => n - k - 1), [], { [j]: 'j', [j + 1]: 'j+1' });
             addStep(`Comparing elements at index ${j} (${arr[j]}) and ${j + 1} (${arr[j + 1]})`);
-            await sleep(animationSpeed);
+            if (await sleep(animationSpeed, runId)) return;
 
             if (arr[j] > arr[j + 1]) {
                 algorithmStats.swaps++;
@@ -179,7 +184,7 @@ async function startBubbleSort() {
                 // Show swapping
                 displayArray(arr, [], [], Array.from({ length: i }, (_, k) => n - k - 1), [j, j + 1], { [j]: 'swap', [j + 1]: 'swap' });
                 addStep(`Swapping ${arr[j]} and ${arr[j + 1]} because ${arr[j]} > ${arr[j + 1]}`);
-                await sleep(animationSpeed);
+                if (await sleep(animationSpeed, runId)) return;
 
                 // Swap
                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
@@ -187,7 +192,7 @@ async function startBubbleSort() {
                 // Show after swap
                 displayArray(arr, [], [], Array.from({ length: i }, (_, k) => n - k - 1), [j, j + 1], { [j]: 'j', [j + 1]: 'j+1' });
                 addStep(`After swap: arr[${j}] = ${arr[j]}, arr[${j + 1}] = ${arr[j + 1]}`);
-                await sleep(animationSpeed);
+                if (await sleep(animationSpeed, runId)) return;
             } else {
                 addStep(`No swap needed (${arr[j]} ≤ ${arr[j + 1]})`);
             }
@@ -196,7 +201,7 @@ async function startBubbleSort() {
         // Mark sorted element
         displayArray(arr, [], [], Array.from({ length: i + 1 }, (_, k) => n - k - 1));
         addStep(`Element ${arr[n - i - 1]} is now in its correct position at index ${n - i - 1}`);
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
     }
 
     displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
@@ -208,7 +213,10 @@ async function startBubbleSort() {
 // Selection Sort with step-by-step
 async function startSelectionSort() {
     if (isAnimating) return;
+    currentRunId++;
+    const runId = currentRunId;
     isAnimating = true;
+    isPaused = false;
     resetStats();
 
     const arr = [...currentArray];
@@ -228,13 +236,13 @@ async function startSelectionSort() {
             updateStatsDisplay();
             displayArray(arr, [minIdx], [j], Array.from({ length: i }, (_, k) => k), [], { [minIdx]: 'minIdx', [j]: 'j' });
             addStep(`Comparing current min ${arr[minIdx]} with ${arr[j]}`);
-            await sleep(animationSpeed);
+            if (await sleep(animationSpeed, runId)) return;
 
             if (arr[j] < arr[minIdx]) {
                 minIdx = j;
                 displayArray(arr, [minIdx], [], Array.from({ length: i }, (_, k) => k), [], { [minIdx]: 'minIdx' });
                 addStep(`New minimum found: ${arr[minIdx]} at index ${minIdx}`);
-                await sleep(animationSpeed);
+                if (await sleep(animationSpeed, runId)) return;
             }
         }
 
@@ -244,13 +252,13 @@ async function startSelectionSort() {
             updateStatsDisplay();
             displayArray(arr, [i, minIdx], [], Array.from({ length: i }, (_, k) => k), [i, minIdx], { [i]: 'i', [minIdx]: 'minIdx' });
             addStep(`Swapping ${arr[i]} (index ${i}) with minimum ${arr[minIdx]} (index ${minIdx})`);
-            await sleep(animationSpeed);
+            if (await sleep(animationSpeed, runId)) return;
 
             [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
 
             displayArray(arr, [i, minIdx], [], Array.from({ length: i }, (_, k) => k), [i, minIdx], { [i]: 'i', [minIdx]: 'minIdx' });
             addStep(`After swap: arr[${i}] = ${arr[i]}, arr[${minIdx}] = ${arr[minIdx]}`);
-            await sleep(animationSpeed);
+            if (await sleep(animationSpeed, runId)) return;
         } else {
             addStep(`Minimum is already at correct position (index ${i})`);
         }
@@ -258,7 +266,7 @@ async function startSelectionSort() {
         // Mark sorted
         displayArray(arr, [], [], Array.from({ length: i + 1 }, (_, k) => k));
         addStep(`Element ${arr[i]} is now in correct position at index ${i}`);
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
     }
 
     displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
@@ -270,7 +278,10 @@ async function startSelectionSort() {
 // Insertion Sort with step-by-step
 async function startInsertionSort() {
     if (isAnimating) return;
+    currentRunId++;
+    const runId = currentRunId;
     isAnimating = true;
+    isPaused = false;
     resetStats();
 
     const arr = [...currentArray];
@@ -286,7 +297,7 @@ async function startInsertionSort() {
         let j = i - 1;
 
         displayArray(arr, [i], [], Array.from({ length: i }, (_, k) => k), [], { [i]: 'key' });
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
 
         while (j >= 0 && arr[j] > key) {
             algorithmStats.comparisons++;
@@ -294,7 +305,7 @@ async function startInsertionSort() {
             updateStatsDisplay();
             displayArray(arr, [j, j + 1], [], Array.from({ length: i }, (_, k) => k), [], { [j]: 'j', [j + 1]: 'j+1' });
             addStep(`Shifting ${arr[j]} to position ${j + 1} because ${arr[j]} > ${key}`);
-            await sleep(animationSpeed);
+            if (await sleep(animationSpeed, runId)) return;
 
             arr[j + 1] = arr[j];
             j--;
@@ -309,7 +320,7 @@ async function startInsertionSort() {
         arr[j + 1] = key;
         displayArray(arr, [j + 1], [], Array.from({ length: i + 1 }, (_, k) => k), [], { [j + 1]: 'inserted' });
         addStep(`Inserted ${key} at position ${j + 1}`);
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
     }
 
     displayArray(arr, [], [], Array.from({ length: n }, (_, k) => k));
@@ -330,7 +341,10 @@ async function startLinearSearch() {
         return;
     }
 
+    currentRunId++;
+    const runId = currentRunId;
     isAnimating = true;
+    isPaused = false;
     resetStats();
     const arr = [...currentArray];
     const targetNum = parseInt(target);
@@ -344,7 +358,7 @@ async function startLinearSearch() {
         updateStatsDisplay();
         displayArray(arr, [i], [], [], [], { [i]: 'i' });
         addStep(`Checking element at index ${i}: ${arr[i]}`);
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
 
         if (arr[i] === targetNum) {
             displayArray(arr, [], [i], [], [], { [i]: 'Found!' });
@@ -372,7 +386,10 @@ async function startBinarySearch() {
         return;
     }
 
+    currentRunId++;
+    const runId = currentRunId;
     isAnimating = true;
+    isPaused = false;
     resetStats();
     const arr = [...currentArray].sort((a, b) => a - b);
     const targetNum = parseInt(target);
@@ -391,7 +408,7 @@ async function startBinarySearch() {
 
         displayArray(arr, [mid], [left, right], [], [], { [left]: 'L', [right]: 'R', [mid]: 'Mid' });
         addStep(`Search range: [${left}..${right}], Mid index: ${mid}, Mid value: ${arr[mid]}`);
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
 
         if (arr[mid] === targetNum) {
             displayArray(arr, [], [mid], [], [], { [mid]: 'Found!' });
@@ -407,7 +424,7 @@ async function startBinarySearch() {
             right = mid - 1;
         }
 
-        await sleep(animationSpeed);
+        if (await sleep(animationSpeed, runId)) return;
     }
 
     addStep(`❌ Value ${targetNum} not found in array`);
@@ -771,6 +788,44 @@ class LinkedList {
         this.head = null;
         this.size = 0;
     }
+
+    addAtFirst(value) {
+        const newNode = new this.Node(value);
+        if (!this.head) {
+            this.head = newNode;
+        } else {
+            newNode.next = this.head;
+            this.head = newNode;
+        }
+        this.size++;
+        return true;
+    }
+
+    removeFirst() {
+        if (!this.head) return null;
+        const value = this.head.value;
+        this.head = this.head.next;
+        this.size--;
+        return value;
+    }
+
+    removeLast() {
+        if (!this.head) return null;
+        if (!this.head.next) {
+            const value = this.head.value;
+            this.head = null;
+            this.size--;
+            return value;
+        }
+        let current = this.head;
+        while (current.next && current.next.next) {
+            current = current.next;
+        }
+        const value = current.next.value;
+        current.next = null;
+        this.size--;
+        return value;
+    }
 }
 
 let linkedList = new LinkedList();
@@ -798,10 +853,14 @@ function displayLinkedList(highlightValue = null) {
         const wrapper = document.createElement('div');
         wrapper.className = 'element-wrapper';
 
-        if (index === 0) {
+        let labelText = '';
+        if (index === 0) labelText = 'HEAD';
+        if (!current.next) labelText = labelText ? 'HEAD & TAIL' : 'TAIL';
+
+        if (labelText) {
             const label = document.createElement('div');
-            label.className = 'element-label';
-            label.textContent = 'HEAD';
+            label.className = 'element-label tail-label'; // Added tail-label class just in case specific styling is needed
+            label.textContent = labelText;
             wrapper.appendChild(label);
         }
 
@@ -893,10 +952,93 @@ function searchInLinkedList() {
     }
 }
 
+function addAtFirstToLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
+    const valueInput = document.getElementById('dsValue');
+    if (!valueInput || !valueInput.value.trim()) {
+        showStatus('Please enter a value', 'error');
+        return;
+    }
+
+    const value = valueInput.value.trim();
+    if (linkedList.addAtFirst(value)) {
+        addStep(`Added ${value} at first position`);
+        displayLinkedList();
+        showStatus(`Added ${value} at first position. Size: ${linkedList.size}`, 'success');
+        valueInput.value = '';
+    }
+}
+
+function removeFirstFromLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
+
+    if (linkedList.size === 0) {
+        showStatus('Linked List is empty', 'error');
+        return;
+    }
+
+    const value = linkedList.removeFirst();
+    if (value !== null) {
+        addStep(`Removed ${value} from first position`);
+        displayLinkedList();
+        showStatus(`Removed ${value} from first position. Size: ${linkedList.size}`, 'success');
+    }
+}
+
+function removeLastFromLinkedList() {
+    algorithmStats.passes++;
+    updateStatsDisplay();
+
+    if (linkedList.size === 0) {
+        showStatus('Linked List is empty', 'error');
+        return;
+    }
+
+    const value = linkedList.removeLast();
+    if (value !== null) {
+        addStep(`Removed ${value} from last position`);
+        displayLinkedList();
+        showStatus(`Removed ${value} from last position. Size: ${linkedList.size}`, 'success');
+    }
+}
+
 // ==================== UI FUNCTIONS ====================
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(ms, runId) {
+    return new Promise(resolve => {
+        const check = async () => {
+            if (runId !== undefined && runId !== currentRunId) {
+                resolve(true); // Signal to stop the current run
+                return;
+            }
+            if (isPaused) {
+                setTimeout(check, 100);
+            } else {
+                setTimeout(() => resolve(false), ms);
+            }
+        };
+        check();
+    });
+}
+
+function stopVisualization() {
+    isPaused = true;
+    showStatus("Visualization Paused", "info");
+    const stopBtn = document.getElementById('stopBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    if (stopBtn) stopBtn.disabled = true;
+    if (resumeBtn) resumeBtn.disabled = false;
+}
+
+function resumeVisualization() {
+    isPaused = false;
+    showStatus("Visualization Resumed", "success");
+    const stopBtn = document.getElementById('stopBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    if (stopBtn) stopBtn.disabled = false;
+    if (resumeBtn) resumeBtn.disabled = true;
 }
 
 function generateNewArray() {
@@ -1064,6 +1206,8 @@ function createSortingContent(title, type) {
             </div>
             
             <button class="control-btn start" onclick="start${type.charAt(0).toUpperCase() + type.slice(1)}Sort()" id="startBtn">Start ${title}</button>
+            <button class="control-btn stop" onclick="stopVisualization()" id="stopBtn">Stop</button>
+            <button class="control-btn resume" onclick="resumeVisualization()" id="resumeBtn" disabled>Resume</button>
             <button class="control-btn reset" onclick="resetVisualization()">Reset</button>
         </div>
         
@@ -1116,7 +1260,11 @@ function createSearchContent() {
                 <span id="speedValue">Medium</span>
             </div>
             
-            <button class="control-btn reset" onclick="resetVisualization()">Reset</button>
+            <div class="controls-row">
+                <button class="control-btn stop" onclick="stopVisualization()" id="stopBtn">Stop</button>
+                <button class="control-btn resume" onclick="resumeVisualization()" id="resumeBtn" disabled>Resume</button>
+                <button class="control-btn reset" onclick="resetVisualization()">Reset</button>
+            </div>
         </div>
         
         <div class="code-snippet">
@@ -1242,8 +1390,11 @@ function createLinkedListContent() {
         <div class="controls">
             <div class="input-group">
                 <input type="text" id="dsValue" placeholder="Enter value">
-                <button class="control-btn" onclick="addToLinkedList()">Add</button>
-                <button class="control-btn" onclick="removeFromLinkedList()">Remove</button>
+                <button class="control-btn" onclick="addToLinkedList()">Add Last</button>
+                <button class="control-btn" onclick="addAtFirstToLinkedList()">Add First</button>
+                <button class="control-btn" onclick="removeFromLinkedList()">Remove Any</button>
+                <button class="control-btn" onclick="removeFirstFromLinkedList()">Remove First</button>
+                <button class="control-btn" onclick="removeLastFromLinkedList()">Remove Last</button>
                 <button class="control-btn" onclick="searchInLinkedList()">Search</button>
             </div>
             
@@ -1542,7 +1693,55 @@ class LinkedList {
         this.head = null;
         this.size = 0;
     }
-}`;
+}
+
+// Add at first method
+LinkedList.prototype.addAtFirst = function(value) {
+    const newNode = new Node(value);
+    
+    if (!this.head) {
+        this.head = newNode;
+        this.size++;
+        return true;
+    }
+    
+    newNode.next = this.head;
+    this.head = newNode;
+    this.size++;
+    return true;
+};
+
+// Remove from first
+LinkedList.prototype.removeFirst = function() {
+    if (!this.head) return null;
+    
+    const value = this.head.value;
+    this.head = this.head.next;
+    this.size--;
+    return value;
+};
+
+// Remove from last
+LinkedList.prototype.removeLast = function() {
+    if (!this.head) return null;
+    
+    if (!this.head.next) {
+        const value = this.head.value;
+        this.head = null;
+        this.size--;
+        return value;
+    }
+    
+    let current = this.head;
+    while (current.next && current.next.next) {
+        current = current.next;
+    }
+    
+    const value = current.next.value;
+    current.next = null;
+    this.size--;
+    return value;
+};`;
 }
 
 // ==================== TREE VISUALIZATION ====================
@@ -1566,7 +1765,7 @@ function initBST() {
     logBST("BST initialized. Enter values to insert.");
 }
 
-function insertBST() {
+async function insertBST() {
     const input = document.getElementById('bstInput').value;
     if (!input) {
         logBST("Please enter a value");
@@ -1574,30 +1773,50 @@ function insertBST() {
     }
 
     const values = input.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
+    if (values.length === 0) return;
 
+    if (isAnimating) return;
+    currentRunId++;
+    const runId = currentRunId;
+    isAnimating = true;
+    isPaused = false;
     resetStats();
-    values.forEach(value => {
-        bstRoot = insertBSTNode(bstRoot, value);
-        logBST(`Inserted: ${value}`);
-    });
 
-    updateBSTVisualization();
+    for (const value of values) {
+        logBST(`Starting insertion of: ${value} `);
+        bstRoot = await insertBSTNodeAnimated(bstRoot, value, runId);
+        updateBSTVisualization();
+        logBST(`Finished insertion of: ${value} `);
+    }
+
+    isAnimating = false;
     document.getElementById('bstInput').value = '';
 }
 
-function insertBSTNode(node, value) {
-    if (!node) return new BSTNode(value);
+async function insertBSTNodeAnimated(node, value, runId) {
+    if (!node) {
+        const newNode = new BSTNode(value);
+        return newNode;
+    }
 
     algorithmStats.comparisons++;
     algorithmStats.rotations++; // Steps
     updateStatsDisplay();
 
+    // Highlight current node
+    node.highlight = 'searching';
+    updateBSTVisualization();
+    if (await sleep(bstSpeed, runId)) return node;
+
     if (value < node.value) {
-        node.left = insertBSTNode(node.left, value);
+        node.highlight = 'searching';
+        node.left = await insertBSTNodeAnimated(node.left, value, runId);
     } else if (value > node.value) {
-        node.right = insertBSTNode(node.right, value);
+        node.highlight = 'searching';
+        node.right = await insertBSTNodeAnimated(node.right, value, runId);
     }
 
+    node.highlight = null;
     return node;
 }
 
@@ -1612,7 +1831,7 @@ function searchBST() {
 
     resetStats();
     highlightBSTSearch(value);
-    logBST(`Searching for: ${value}`);
+    logBST(`Searching for: ${value} `);
 }
 
 function highlightBSTSearch(value) {
@@ -1627,7 +1846,7 @@ function highlightBSTSearch(value) {
         algorithmStats.comparisons++;
         updateStatsDisplay();
 
-        const nodeDiv = parentDiv.querySelector(`[data-value="${node.value}"]`);
+        const nodeDiv = parentDiv.querySelector(`[data - value= "${node.value}"]`);
         if (nodeDiv) {
             nodeDiv.classList.add('searching');
 
@@ -1635,7 +1854,7 @@ function highlightBSTSearch(value) {
                 if (node.value === value) {
                     nodeDiv.classList.remove('searching');
                     nodeDiv.classList.add('found');
-                    logBST(`Found: ${value}`);
+                    logBST(`Found: ${value} `);
                     found = true;
                 } else {
                     nodeDiv.classList.remove('searching');
@@ -1662,21 +1881,21 @@ function highlightBSTSearch(value) {
 function traverseInOrder() {
     const result = [];
     inOrderTraversal(bstRoot, result);
-    logBST(`In-order Traversal: ${result.join(' → ')}`);
+    logBST(`In - order Traversal: ${result.join(' → ')} `);
     highlightTraversal(result, 'inorder');
 }
 
 function traversePreOrder() {
     const result = [];
     preOrderTraversal(bstRoot, result);
-    logBST(`Pre-order Traversal: ${result.join(' → ')}`);
+    logBST(`Pre - order Traversal: ${result.join(' → ')} `);
     highlightTraversal(result, 'preorder');
 }
 
 function traversePostOrder() {
     const result = [];
     postOrderTraversal(bstRoot, result);
-    logBST(`Post-order Traversal: ${result.join(' → ')}`);
+    logBST(`Post - order Traversal: ${result.join(' → ')} `);
     highlightTraversal(result, 'postorder');
 }
 
@@ -1708,7 +1927,7 @@ function highlightTraversal(values, type) {
     function highlightNext() {
         if (index >= values.length) return;
 
-        const nodeDiv = document.querySelector(`.tree-node[data-value="${values[index]}"]`);
+        const nodeDiv = document.querySelector(`.tree - node[data - value="${values[index]}"]`);
         if (nodeDiv) {
             nodeDiv.classList.add('traversing');
 
@@ -1735,7 +1954,7 @@ function deleteBST() {
 
     bstRoot = deleteBSTNode(bstRoot, value);
     updateBSTVisualization();
-    logBST(`Deleted: ${value}`);
+    logBST(`Deleted: ${value} `);
     document.getElementById('bstInput').value = '';
 }
 
@@ -1786,28 +2005,98 @@ function updateBSTVisualization() {
         return;
     }
 
-    const treeHTML = createBSTHTML(bstRoot, 0);
-    container.innerHTML = treeHTML;
+    // Create SVG for arrows
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.style.position = "absolute";
+    svg.style.top = "0";
+    svg.style.left = "0";
+    svg.style.pointerEvents = "none";
+    svg.style.zIndex = "1";
+    container.appendChild(svg);
+
+    const treeContainer = document.createElement('div');
+    treeContainer.className = 'tree-nodes-container';
+    treeContainer.style.position = "relative";
+    treeContainer.style.width = "100%";
+    treeContainer.style.height = "100%";
+    treeContainer.style.zIndex = "2";
+    container.appendChild(treeContainer);
+
+    const nodeWidth = 50;
+    const levelHeight = 80;
+    const initialGap = container.offsetWidth / 2;
+
+    renderTreeNode(bstRoot, container.offsetWidth / 2, 40, initialGap, treeContainer, svg);
 }
 
-function createBSTHTML(node, depth) {
-    if (!node) return '';
+function renderTreeNode(node, x, y, gap, container, svg) {
+    if (!node) return;
 
-    const leftHTML = createBSTHTML(node.left, depth + 1);
-    const rightHTML = createBSTHTML(node.right, depth + 1);
+    // Create node element
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = `tree - node ${node.highlight || ''} `;
+    nodeDiv.style.left = `${x} px`;
+    nodeDiv.style.top = `${y} px`;
+    nodeDiv.setAttribute('data-value', node.value);
 
-    return `
-        <div class="tree-level" data-depth="${depth}">
-            <div class="tree-node" data-value="${node.value}">
-                ${node.label ? `<div class="element-label tree-label">${node.label}</div>` : ''}
-                <div class="node-value">${node.value}</div>
-                <div class="node-children">
-                    ${node.left ? '<div class="left-child">' + leftHTML + '</div>' : ''}
-                    ${node.right ? '<div class="right-child">' + rightHTML + '</div>' : ''}
-                </div>
-            </div>
-        </div>
-    `;
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'node-value';
+    valueDiv.textContent = node.value;
+    nodeDiv.appendChild(valueDiv);
+
+    container.appendChild(nodeDiv);
+
+    const nextGap = gap / 2;
+    const nextY = y + 100;
+
+    if (node.left) {
+        const nextX = x - gap / 1.5;
+        drawTreeArrow(x, y, nextX, nextY, svg);
+        renderTreeNode(node.left, nextX, nextY, nextGap, container, svg);
+    }
+
+    if (node.right) {
+        const nextX = x + gap / 1.5;
+        drawTreeArrow(x, y, nextX, nextY, svg);
+        renderTreeNode(node.right, nextX, nextY, nextGap, container, svg);
+    }
+}
+
+function drawTreeArrow(x1, y1, x2, y2, svg) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    // Node radius is 25px (50px width).
+    // Start from bottom of parent, end at top of child (plus cushion for arrowhead)
+    const startY = y1 + 25;
+    const endY = y2 - 25;
+
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", startY);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", endY);
+    line.setAttribute("stroke", "#34495e"); // Dark gray/blue for visibility
+    line.setAttribute("stroke-width", "2");
+    line.setAttribute("marker-end", "url(#arrowhead)");
+    svg.appendChild(line);
+
+    // Ensure arrowhead marker exists
+    if (!document.getElementById('arrowhead')) {
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        marker.setAttribute("id", "arrowhead");
+        marker.setAttribute("markerWidth", "10");
+        marker.setAttribute("markerHeight", "7");
+        marker.setAttribute("refX", "9"); // Position tip at end of line
+        marker.setAttribute("refY", "3.5");
+        marker.setAttribute("orient", "auto");
+        const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        polygon.setAttribute("points", "0 0, 10 3.5, 0 7");
+        polygon.setAttribute("fill", "#34495e"); // Match line color
+        marker.appendChild(polygon);
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+    }
 }
 
 function clearBSTHighlights() {
@@ -1822,7 +2111,7 @@ function logBST(message) {
 
     const step = document.createElement('div');
     step.className = 'step';
-    step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    step.textContent = `[${new Date().toLocaleTimeString()}] ${message} `;
     log.appendChild(step);
     log.scrollTop = log.scrollHeight;
 }
@@ -1834,13 +2123,15 @@ function showBST() {
     }
 
     document.getElementById('algorithmContent').innerHTML = `
-        <h3>Binary Search Tree (BST) Visualization</h3>
+    < h3 > Binary Search Tree(BST) Visualization</h3 >
         
         <div class="input-group">
             <input type="text" id="bstInput" placeholder="Enter value (comma separated)">
             <button class="control-btn" onclick="insertBST()">Insert</button>
             <button class="control-btn" onclick="deleteBST()">Delete</button>
             <button class="control-btn" onclick="searchBST()">Search</button>
+            <button class="control-btn stop" onclick="stopVisualization()" id="stopBtn">Stop</button>
+            <button class="control-btn resume" onclick="resumeVisualization()" id="resumeBtn" disabled>Resume</button>
             <button class="control-btn reset" onclick="resetBST()">Reset Tree</button>
         </div>
         
@@ -1885,7 +2176,7 @@ function showBST() {
         <div class="code-snippet">
             <pre><code>${getBSTCode()}</code></pre>
         </div>
-    `;
+`;
 
     initBST();
 }
@@ -1909,7 +2200,7 @@ function initAVL() {
     logAVL("AVL Tree initialized. Enter values to insert.");
 }
 
-function insertAVL() {
+async function insertAVL() {
     const input = document.getElementById('avlInput').value;
     if (!input) {
         logAVL("Please enter a value");
@@ -1917,31 +2208,49 @@ function insertAVL() {
     }
 
     const values = input.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
+    if (values.length === 0) return;
 
+    if (isAnimating) return;
+    currentRunId++;
+    const runId = currentRunId;
+    isAnimating = true;
+    isPaused = false;
     resetStats();
-    values.forEach(value => {
-        avlRoot = insertAVLNode(avlRoot, value);
-        logAVL(`Inserted: ${value}`);
-    });
 
-    updateAVLVisualization();
+    for (const value of values) {
+        logAVL(`Starting insertion of: ${value} `);
+        avlRoot = await insertAVLNodeAnimated(avlRoot, value, runId);
+        updateAVLVisualization();
+        logAVL(`Finished insertion of: ${value} `);
+    }
+
+    isAnimating = false;
     document.getElementById('avlInput').value = '';
 }
 
-function insertAVLNode(node, value) {
+async function insertAVLNodeAnimated(node, value, runId) {
     if (!node) return new AVLNode(value);
 
     algorithmStats.comparisons++;
-    algorithmStats.rotations++; // Using rotations for steps here too
+    algorithmStats.rotations++; // Steps
     updateStatsDisplay();
 
+    // Highlight current node
+    node.highlight = 'searching';
+    updateAVLVisualization();
+    if (await sleep(avlSpeed, runId)) return node;
+
     if (value < node.value) {
-        node.left = insertAVLNode(node.left, value);
+        node.left = await insertAVLNodeAnimated(node.left, value, runId);
     } else if (value > node.value) {
-        node.right = insertAVLNode(node.right, value);
+        node.right = await insertAVLNodeAnimated(node.right, value, runId);
     } else {
+        node.highlight = null;
+        updateAVLVisualization();
         return node; // No duplicates
     }
+
+    node.highlight = null;
 
     // Update height
     node.height = 1 + Math.max(getHeight(node.left), getHeight(node.right));
@@ -1949,22 +2258,25 @@ function insertAVLNode(node, value) {
     // Get balance factor
     const balance = getBalance(node);
 
-    // Perform rotations if needed
-    // Left Left Case
+    // Rebalance if needed
     if (balance > 1 && value < node.left.value) {
-        logAVL("Performing Right Rotation (LL Case)");
+        logAVL(`Right Rotation on ${node.value} `);
+        algorithmStats.rotations++;
+        updateStatsDisplay();
         return rightRotate(node);
     }
 
-    // Right Right Case
     if (balance < -1 && value > node.right.value) {
-        logAVL("Performing Left Rotation (RR Case)");
+        logAVL(`Left Rotation on ${node.value} `);
+        algorithmStats.rotations++;
+        updateStatsDisplay();
         return leftRotate(node);
     }
 
-    // Left Right Case
     if (balance > 1 && value > node.left.value) {
-        logAVL("Performing Left-Right Rotation (LR Case)");
+        logAVL(`Left - Right Rotation on ${node.value} `);
+        algorithmStats.rotations++;
+        updateStatsDisplay();
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
@@ -2039,7 +2351,7 @@ function checkBalanceFactors() {
         if (!node) return;
 
         const balance = getBalance(node);
-        logAVL(`Node ${node.value}: Balance factor = ${balance} ${Math.abs(balance) > 1 ? '(UNBALANCED!)' : '(balanced)'}`);
+        logAVL(`Node ${node.value}: Balance factor = ${balance} ${Math.abs(balance) > 1 ? '(UNBALANCED!)' : '(balanced)'} `);
 
         check(node.left);
         check(node.right);
@@ -2059,33 +2371,64 @@ function updateAVLVisualization() {
         return;
     }
 
-    const treeHTML = createAVLHTML(avlRoot, 0);
-    container.innerHTML = treeHTML;
+    // Create SVG for arrows
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.style.position = "absolute";
+    svg.style.top = "0";
+    svg.style.left = "0";
+    svg.style.pointerEvents = "none";
+    svg.style.zIndex = "1";
+    container.appendChild(svg);
+
+    const treeContainer = document.createElement('div');
+    treeContainer.className = 'tree-nodes-container';
+    treeContainer.style.position = "relative";
+    treeContainer.style.width = "100%";
+    treeContainer.style.height = "100%";
+    treeContainer.style.zIndex = "2";
+    container.appendChild(treeContainer);
+
+    const initialGap = container.offsetWidth / 2;
+
+    renderAVLTreeNode(avlRoot, container.offsetWidth / 2, 40, initialGap, treeContainer, svg);
 }
 
-function createAVLHTML(node, depth) {
-    if (!node) return '';
+function renderAVLTreeNode(node, x, y, gap, container, svg) {
+    if (!node) return;
 
     const balance = getBalance(node);
-    const leftHTML = createAVLHTML(node.left, depth + 1);
-    const rightHTML = createAVLHTML(node.right, depth + 1);
-
     const balanceClass = Math.abs(balance) > 1 ? 'unbalanced' : 'balanced';
 
-    return `
-        <div class="tree-level" data-depth="${depth}">
-            <div class="tree-node avl-node ${balanceClass}" data-value="${node.value}" data-balance="${balance}">
-                <div class="node-value">
-                    ${node.value}
-                    <div class="balance-factor">BF: ${balance}</div>
-                </div>
-                <div class="node-children">
-                    ${node.left ? '<div class="left-child">' + leftHTML + '</div>' : ''}
-                    ${node.right ? '<div class="right-child">' + rightHTML + '</div>' : ''}
-                </div>
-            </div>
-        </div>
-    `;
+    // Create node element
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = `tree - node avl - node ${balanceClass} ${node.highlight || ''} `;
+    nodeDiv.style.left = `${x} px`;
+    nodeDiv.style.top = `${y} px`;
+    nodeDiv.setAttribute('data-value', node.value);
+
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'node-value';
+    valueDiv.innerHTML = `${node.value} <div class="balance-factor">BF: ${balance}</div>`;
+    nodeDiv.appendChild(valueDiv);
+
+    container.appendChild(nodeDiv);
+
+    const nextGap = gap / 2;
+    const nextY = y + 100;
+
+    if (node.left) {
+        const nextX = x - gap / 1.5;
+        drawTreeArrow(x, y, nextX, nextY, svg);
+        renderAVLTreeNode(node.left, nextX, nextY, nextGap, container, svg);
+    }
+
+    if (node.right) {
+        const nextX = x + gap / 1.5;
+        drawTreeArrow(x, y, nextX, nextY, svg);
+        renderAVLTreeNode(node.right, nextX, nextY, nextGap, container, svg);
+    }
 }
 
 function logAVL(message) {
@@ -2094,7 +2437,7 @@ function logAVL(message) {
 
     const step = document.createElement('div');
     step.className = 'step';
-    step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    step.textContent = `[${new Date().toLocaleTimeString()}] ${message} `;
     log.appendChild(step);
     log.scrollTop = log.scrollHeight;
 }
@@ -2116,13 +2459,15 @@ function showAVL() {
     }
 
     document.getElementById('algorithmContent').innerHTML = `
-        <h3>AVL Tree Visualization</h3>
+    < h3 > AVL Tree Visualization</h3 >
         
         <div class="input-group">
             <input type="text" id="avlInput" placeholder="Enter value (comma separated)">
             <button class="control-btn" onclick="insertAVL()">Insert</button>
             <button class="control-btn" onclick="deleteAVL()">Delete</button>
             <button class="control-btn" onclick="balanceAVL()">Check Balance</button>
+            <button class="control-btn stop" onclick="stopVisualization()" id="stopBtn">Stop</button>
+            <button class="control-btn resume" onclick="resumeVisualization()" id="resumeBtn" disabled>Resume</button>
             <button class="control-btn reset" onclick="resetAVL()">Reset Tree</button>
         </div>
         
@@ -2166,7 +2511,7 @@ function showAVL() {
         <div class="code-snippet">
             <pre><code>${getAVLCode()}</code></pre>
         </div>
-    `;
+`;
 
     initAVL();
 }
@@ -2179,7 +2524,7 @@ function showQueueSelection() {
     }
 
     document.getElementById('algorithmContent').innerHTML = `
-        <h3>Queue Types</h3>
+    < h3 > Queue Types</h3 >
         
         <div class="info-panel">
             <h4>Select Queue Type:</h4>
@@ -2201,7 +2546,7 @@ function showQueueSelection() {
             <p><strong>Linear Queue:</strong> Simple implementation, but can waste space</p>
             <p><strong>Circular Queue:</strong> More complex, but efficient memory usage</p>
         </div>
-    `;
+`;
 }
 
 function showLinearQueue() {
@@ -2241,7 +2586,7 @@ function showCircularQueue() {
     }
 
     document.getElementById('algorithmContent').innerHTML = `
-        <h3>Circular Queue Visualization</h3>
+    < h3 > Circular Queue Visualization</h3 >
         
         <div class="input-group">
             <input type="number" id="queueSize" placeholder="Queue Size (3-15)" min="3" max="15" value="8">
@@ -2348,7 +2693,7 @@ function showCircularQueue() {
 }
             </code></pre>
         </div>
-    `;
+`;
 
     initCircularQueue();
 }
@@ -2366,7 +2711,7 @@ function initCircularQueue() {
 
     updateCircularQueueVisualization();
     updateCircularQueueStats();
-    logQueue(`Circular Queue initialized with size ${queueSize}`);
+    logQueue(`Circular Queue initialized with size ${queueSize} `);
 }
 
 function updateQueueSpeed() {
@@ -2405,7 +2750,7 @@ function enqueueCircular() {
 
         updateCircularQueueVisualization();
         updateCircularQueueStats();
-        logQueue(`Enqueued: ${value} at position ${rear}`);
+        logQueue(`Enqueued: ${value} at position ${rear} `);
 
         // Clear input
         document.getElementById('queueInput').value = '';
@@ -2437,7 +2782,7 @@ function dequeueCircular() {
 
         updateCircularQueueVisualization();
         updateCircularQueueStats();
-        logQueue(`Dequeued: ${value} from position ${front === -1 ? 'N/A' : (front === 0 ? rear : (front - 1 + queueSize) % queueSize)}`);
+        logQueue(`Dequeued: ${value} from position ${front === -1 ? 'N/A' : (front === 0 ? rear : (front - 1 + queueSize) % queueSize)} `);
     }, queueSpeed);
 }
 
@@ -2448,7 +2793,7 @@ function peekFrontCircular() {
     }
 
     highlightFrontPosition();
-    logQueue(`Front element: ${circularQueue[front]} at position ${front}`);
+    logQueue(`Front element: ${circularQueue[front]} at position ${front} `);
 
     setTimeout(() => {
         clearQueueHighlights();
@@ -2462,7 +2807,7 @@ function peekRearCircular() {
     }
 
     highlightRearPosition();
-    logQueue(`Rear element: ${circularQueue[rear]} at position ${rear}`);
+    logQueue(`Rear element: ${circularQueue[rear]} at position ${rear} `);
 
     setTimeout(() => {
         clearQueueHighlights();
@@ -2565,8 +2910,8 @@ function updateCircularQueueVisualization() {
         const cell = document.createElement('div');
         cell.className = 'queue-cell';
         cell.style.position = 'absolute';
-        cell.style.left = `${x}px`;
-        cell.style.top = `${y}px`;
+        cell.style.left = `${x} px`;
+        cell.style.top = `${y} px`;
         cell.style.transform = 'translate(-50%, -50%)';
 
         // Add cell number
@@ -2603,9 +2948,9 @@ function updateCircularQueueVisualization() {
             const arrow = document.createElement('div');
             arrow.className = 'queue-arrow';
             arrow.style.position = 'absolute';
-            arrow.style.left = `${x}px`;
-            arrow.style.top = `${y}px`;
-            arrow.style.width = `${Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2))}px`;
+            arrow.style.left = `${x} px`;
+            arrow.style.top = `${y} px`;
+            arrow.style.width = `${Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2))} px`;
             arrow.style.transform = `rotate(${Math.atan2(nextY - y, nextX - x)}rad)`;
             arrow.style.transformOrigin = '0 0';
 
@@ -2627,9 +2972,9 @@ function updateCircularQueueVisualization() {
         const arrow = document.createElement('div');
         arrow.className = 'queue-arrow circular-arrow';
         arrow.style.position = 'absolute';
-        arrow.style.left = `${lastX}px`;
-        arrow.style.top = `${lastY}px`;
-        arrow.style.width = `${Math.sqrt(Math.pow(firstX - lastX, 2) + Math.pow(firstY - lastY, 2))}px`;
+        arrow.style.left = `${lastX} px`;
+        arrow.style.top = `${lastY} px`;
+        arrow.style.width = `${Math.sqrt(Math.pow(firstX - lastX, 2) + Math.pow(firstY - lastY, 2))} px`;
         arrow.style.transform = `rotate(${Math.atan2(firstY - lastY, firstX - lastX)}rad)`;
         arrow.style.transformOrigin = '0 0';
 
@@ -2748,7 +3093,7 @@ function logQueue(message) {
 
     const step = document.createElement('div');
     step.className = 'step';
-    step.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    step.textContent = `[${new Date().toLocaleTimeString()}] ${message} `;
     log.appendChild(step);
     log.scrollTop = log.scrollHeight;
 }
@@ -2766,7 +3111,7 @@ function deleteAVL() {
 
     avlRoot = deleteAVLNode(avlRoot, value);
     updateAVLVisualization();
-    logAVL(`Deleted: ${value}`);
+    logAVL(`Deleted: ${value} `);
     document.getElementById('avlInput').value = '';
 }
 
@@ -2858,15 +3203,15 @@ function getBalance(node) {
 function rightRotate(y) {
     const x = y.left;
     const T2 = x.right;
-    
+
     // Perform rotation
     x.right = y;
     y.left = T2;
-    
+
     // Update heights
     y.height = 1 + Math.max(getHeight(y.left), getHeight(y.right));
     x.height = 1 + Math.max(getHeight(x.left), getHeight(x.right));
-    
+
     return x;
 }
 
@@ -2874,22 +3219,22 @@ function rightRotate(y) {
 function leftRotate(x) {
     const y = x.right;
     const T2 = y.left;
-    
+
     // Perform rotation
     y.left = x;
     x.right = T2;
-    
+
     // Update heights
     x.height = 1 + Math.max(getHeight(x.left), getHeight(x.right));
     y.height = 1 + Math.max(getHeight(y.left), getHeight(y.right));
-    
+
     return y;
 }
 
 // Insert into AVL tree
 function insertAVL(root, value) {
     if (!root) return new AVLNode(value);
-    
+
     if (value < root.value) {
         root.left = insertAVL(root.left, value);
     } else if (value > root.value) {
@@ -2897,38 +3242,38 @@ function insertAVL(root, value) {
     } else {
         return root; // No duplicates
     }
-    
+
     // Update height
     root.height = 1 + Math.max(getHeight(root.left), getHeight(root.right));
-    
+
     // Get balance factor
     const balance = getBalance(root);
-    
+
     // Perform rotations if needed
     // Left Left Case
     if (balance > 1 && value < root.left.value) {
         return rightRotate(root);
     }
-    
+
     // Right Right Case
     if (balance < -1 && value > root.right.value) {
         return leftRotate(root);
     }
-    
+
     // Left Right Case
     if (balance > 1 && value > root.left.value) {
         root.left = leftRotate(root.left);
         return rightRotate(root);
     }
-    
+
     // Right Left Case
     if (balance < -1 && value < root.right.value) {
         root.right = rightRotate(root.right);
         return leftRotate(root);
     }
-    
+
     return root;
-}`;
+} `;
 }
 
 function getBSTCode() {
@@ -2945,13 +3290,13 @@ class BSTNode {
 // Insert into BST
 function insertBST(root, value) {
     if (!root) return new BSTNode(value);
-    
+
     if (value < root.value) {
         root.left = insertBST(root.left, value);
     } else if (value > root.value) {
         root.right = insertBST(root.right, value);
     }
-    
+
     return root;
 }
 
@@ -2960,7 +3305,7 @@ function searchBST(root, value) {
     if (!root || root.value === value) {
         return root;
     }
-    
+
     if (value < root.value) {
         return searchBST(root.left, value);
     } else {
@@ -2974,7 +3319,7 @@ function inOrderTraversal(root) {
     inOrderTraversal(root.left);
     console.log(root.value);
     inOrderTraversal(root.right);
-}`;
+} `;
 }
 
 // ==================== INITIALIZATION ====================
