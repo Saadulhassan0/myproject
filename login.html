@@ -11,14 +11,14 @@
 
 <body>
     <div class="container">
-        <form id="loginForm" class="form active">
+        <form id="loginForm" class="form active" novalidate>
             <h2>Login</h2>
 
             <div class="field-container">
-                <label class="field-label">Username</label>
+                <label class="field-label">Email Address</label>
                 <div class="input-with-icon">
-                    <span class="icon">👤</span>
-                    <input type="email" id="loginEmail" placeholder="Type your username" required>
+                    <span class="icon">📧</span>
+                    <input type="email" id="loginEmail" placeholder="Type your email">
                 </div>
                 <small class="error" id="loginEmailError"></small>
             </div>
@@ -27,11 +27,18 @@
                 <label class="field-label">Password</label>
                 <div class="input-with-icon">
                     <span class="icon">🔒</span>
-                    <input type="password" id="loginPassword" placeholder="Type your password" required minlength="6">
+                    <input type="password" id="loginPassword" placeholder="Type your password">
                     <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
                 </div>
                 <small class="error" id="loginPasswordError"></small>
             </div>
+
+            <div class="remember-me-container">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember Me</label>
+            </div>
+
+
 
             <button type="submit" class="pill-btn">LOGIN</button>
 
@@ -41,14 +48,14 @@
             </div>
         </form>
 
-        <form id="registerForm" class="form">
+        <form id="registerForm" class="form" novalidate>
             <h2>Sign Up</h2>
 
             <div class="field-container">
                 <label class="field-label">Full Name</label>
                 <div class="input-with-icon">
                     <span class="icon">👤</span>
-                    <input type="text" id="regName" placeholder="Type your name" required minlength="3">
+                    <input type="text" id="regName" placeholder="Type your name">
                 </div>
                 <small class="error" id="regNameError"></small>
             </div>
@@ -57,7 +64,7 @@
                 <label class="field-label">Email</label>
                 <div class="input-with-icon">
                     <span class="icon">📧</span>
-                    <input type="email" id="regEmail" placeholder="Type your email" required>
+                    <input type="email" id="regEmail" placeholder="Type your email">
                 </div>
                 <small class="error" id="regEmailError"></small>
             </div>
@@ -66,7 +73,7 @@
                 <label class="field-label">CNIC</label>
                 <div class="input-with-icon">
                     <span class="icon">🆔</span>
-                    <input type="text" id="regCNIC" placeholder="12345-1234567-1" required>
+                    <input type="text" id="regCNIC" placeholder="12345-1234567-1">
                 </div>
                 <small class="error" id="regCNICError"></small>
             </div>
@@ -75,7 +82,7 @@
                 <label class="field-label">Phone</label>
                 <div class="input-with-icon">
                     <span class="icon">📱</span>
-                    <input type="text" id="regPhone" placeholder="03xx-xxxxxxx" required>
+                    <input type="text" id="regPhone" placeholder="03xx-xxxxxxx">
                 </div>
                 <small class="error" id="regPhoneError"></small>
             </div>
@@ -84,7 +91,7 @@
                 <label class="field-label" for="regDOB">Date of Birth</label>
                 <div class="input-with-icon">
                     <span class="icon">📅</span>
-                    <input type="date" id="regDOB" required aria-label="Date of Birth">
+                    <input type="date" id="regDOB" aria-label="Date of Birth">
                 </div>
                 <small class="error" id="regDOBError"></small>
             </div>
@@ -93,7 +100,7 @@
                 <label class="field-label">Password</label>
                 <div class="input-with-icon">
                     <span class="icon">🔒</span>
-                    <input type="password" id="regPassword" placeholder="Type your password" required minlength="6">
+                    <input type="password" id="regPassword" placeholder="Type your password">
                     <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
                 </div>
                 <small class="error" id="regPasswordError"></small>
@@ -103,8 +110,7 @@
                 <label class="field-label">Confirm Password</label>
                 <div class="input-with-icon">
                     <span class="icon">🔒</span>
-                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required
-                        minlength="6">
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password">
                     <button type="button" class="toggle-password" data-target="regConfirmPassword">👁️</button>
                 </div>
                 <small class="error" id="regConfirmPasswordError"></small>
@@ -118,6 +124,15 @@
                 </div>
                 <small class="error" id="regProfilePicError"></small>
             </div>
+
+            <div class="terms-container"
+                style="display: flex; align-items: center; gap: 10px; margin: 15px 0; text-align: left;">
+                <input type="checkbox" id="regTerms">
+                <label for="regTerms" style="font-size: 14px; color: #666; cursor: pointer;">I agree to the
+                    terms</label>
+            </div>
+            <small class="error" id="regTermsError"
+                style="margin-top: -10px; margin-bottom: 15px; text-align: left;"></small>
 
             <button type="submit" class="pill-btn">REGISTER</button>
             <p>Already have an account? <a href="#" id="showLogin">Login Here</a></p>

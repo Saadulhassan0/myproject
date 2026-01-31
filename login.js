@@ -37,6 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const regPassword = document.getElementById('regPassword');
     const regConfirmPassword = document.getElementById('regConfirmPassword');
     const regProfilePic = document.getElementById('regProfilePic');
+    const rememberMe = document.getElementById('rememberMe');
+    const regTerms = document.getElementById('regTerms');
+
+    // Load remembered email
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail && loginEmail) {
+        loginEmail.value = savedEmail;
+        if (rememberMe) rememberMe.checked = true;
+    }
 
     // Error elements
     const loginEmailError = document.getElementById('loginEmailError');
@@ -49,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const regPasswordError = document.getElementById('regPasswordError');
     const regConfirmPasswordError = document.getElementById('regConfirmPasswordError');
     const regProfilePicError = document.getElementById('regProfilePicError');
+    const regTermsError = document.getElementById('regTermsError');
 
     // ==================== HELPER FUNCTIONS ====================
 
@@ -75,7 +85,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function clearErrors() {
         document.querySelectorAll('.error').forEach(e => {
             e.textContent = '';
-            e.style.color = '';
+            e.style.display = 'none';
+            const container = e.closest('.field-container')?.querySelector('.input-with-icon');
+            if (container) container.classList.remove('invalid');
         });
     }
 
@@ -188,14 +200,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Name validation - letters and spaces only
     regName.addEventListener('input', function () {
-        if (this.value.trim().length > 0) {
-            if (this.value.trim().length < 3) {
-                showError(regNameError, 'Please Enter Your Correct Name');
+        // Block numbers and symbols - keep only letters and spaces
+        this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+
+        const value = this.value.trim();
+        if (value.length > 0) {
+            if (value.length < 3) {
+                showError(regNameError, 'Name must be at least 3 characters');
             } else {
                 showError(regNameError, '');
             }
         } else {
-            showError(regNameError, 'Please Enter Your Name');
+            showError(regNameError, 'Please enter your name');
         }
     });
 
@@ -249,13 +265,15 @@ document.addEventListener('DOMContentLoaded', function () {
         this.value = value;
 
         if (value.length > 0) {
-            if (/^03\d{2}-\d{7}$/.test(value)) {
-                showError(regPhoneError, '');
+            if (!value.startsWith('03')) {
+                showError(regPhoneError, 'Phone must start with 03');
+            } else if (!/^03\d{2}-\d{7}$/.test(value)) {
+                showError(regPhoneError, 'Please enter a valid phone number (03xx-xxxxxxx)');
             } else {
-                showError(regPhoneError, 'Format: 03xx-xxxxxxx');
+                showError(regPhoneError, '');
             }
         } else {
-            showError(regPhoneError, 'Please Enter Your Phone');
+            showError(regPhoneError, 'Please enter your phone number');
         }
     });
 
@@ -387,31 +405,49 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'regPhone', errorId: 'regPhoneError', msg: 'Please Enter Your Phone' },
             { id: 'regDOB', errorId: 'regDOBError', msg: 'Please Enter Your Date of Birth' },
             { id: 'regPassword', errorId: 'regPasswordError', msg: 'Please Enter Your Password' },
-            { id: 'regConfirmPassword', errorId: 'regConfirmPasswordError', msg: 'Please Confirm Your Password' }
+            { id: 'regConfirmPassword', errorId: 'regConfirmPasswordError', msg: 'Please Confirm Your Password' },
+            { id: 'regProfilePic', errorId: 'regProfilePicError', msg: 'Please upload a profile picture' },
+            { id: 'regTerms', errorId: 'regTermsError', msg: 'You must agree to the terms to register' }
         ];
 
         fields.forEach(field => {
             const input = document.getElementById(field.id);
             const errorElement = document.getElementById(field.errorId);
-            if (!input.value.trim()) {
+            const value = input.value.trim();
+
+            if (!value) {
                 showError(errorElement, field.msg);
                 isValid = false;
             } else {
                 // Additional format checks if already filled
-                if (field.id === 'regEmail' && !validateEmail(input.value.trim())) {
-                    showError(errorElement, 'Please Enter Your Valid Email');
+                if (field.id === 'regName' && !/^[A-Za-z\s]+$/.test(value)) {
+                    showError(errorElement, 'Name can only contain letters and spaces');
                     isValid = false;
-                } else if (field.id === 'regCNIC' && !/^\d{5}-\d{7}-\d$/.test(input.value)) {
-                    showError(errorElement, 'Please Enter Your Valid CNIC');
+                } else if (field.id === 'regName' && value.length < 3) {
+                    showError(errorElement, 'Name must be at least 3 characters');
                     isValid = false;
-                } else if (field.id === 'regPhone' && !/^03\d{2}-\d{7}$/.test(input.value)) {
-                    showError(errorElement, 'Please Enter Your Valid Phone');
+                } else if (field.id === 'regEmail' && !validateEmail(value)) {
+                    showError(errorElement, 'Please enter a valid email address');
                     isValid = false;
-                } else if (field.id === 'regPassword' && input.value.length < 6) {
-                    showError(errorElement, 'Please Enter Your Password (Min 6)');
+                } else if (field.id === 'regCNIC' && !/^\d{5}-\d{7}-\d$/.test(value)) {
+                    showError(errorElement, 'Please enter a valid CNIC');
                     isValid = false;
-                } else if (field.id === 'regConfirmPassword' && input.value !== regPassword.value) {
-                    showError(errorElement, 'Passwords Do Not Match');
+                } else if (field.id === 'regPhone') {
+                    if (!value.startsWith('03')) {
+                        showError(errorElement, 'Phone must start with 03');
+                        isValid = false;
+                    } else if (!/^03\d{2}-\d{7}$/.test(value)) {
+                        showError(errorElement, 'Please enter a valid phone number (03xx-xxxxxxx)');
+                        isValid = false;
+                    }
+                } else if (field.id === 'regPassword' && value.length < 6) {
+                    showError(errorElement, 'Password must be at least 6 characters');
+                    isValid = false;
+                } else if (field.id === 'regConfirmPassword' && value !== regPassword.value) {
+                    showError(errorElement, 'Passwords do not match');
+                    isValid = false;
+                } else if (field.id === 'regTerms' && !regTerms.checked) {
+                    showError(errorElement, 'You must agree to the terms');
                     isValid = false;
                 }
             }
@@ -483,9 +519,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!loginPassword.value) {
             showError(loginPasswordError, 'Please Enter Your Password');
             isValid = false;
-        } else if (loginPassword.value.length < 6) {
-            showError(loginPasswordError, 'Please Enter Your Correct Password');
-            isValid = false;
         }
 
         if (!isValid) return;
@@ -511,6 +544,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 if (data.success) {
+                    // Remember Me Logic
+                    if (rememberMe && rememberMe.checked) {
+                        localStorage.setItem('rememberedEmail', loginEmail.value.trim());
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
                     showSuccessMessage('Login successful! Redirecting...');
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
                 } else {
@@ -545,13 +585,6 @@ document.addEventListener('DOMContentLoaded', function () {
         form.appendChild(successDiv);
     }
 
-    // Clear specific error on input
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', function () {
-            if (this.value.trim()) {
-                const errorElement = document.getElementById(this.id + 'Error');
-                if (errorElement) showError(errorElement, ''); // Clear error
-            }
-        });
-    });
+    // Clear specific error on input is now handled within each specific validation listener
+    // or through the general validation sweep on submit.
 });

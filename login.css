@@ -127,6 +127,27 @@ input[type="file"] {
     text-decoration: none;
 }
 
+.remember-me-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.remember-me-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.remember-me-container label {
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+}
+
 .pill-btn {
     background: linear-gradient(to right, #61d9e7, #bd33f2);
     border: none;
@@ -217,8 +238,12 @@ input[type="file"] {
     display: block;
 }
 
-/* Validation styles (keeping them minimal but functional) */
-input.invalid+.icon {
+/* Validation styles */
+.input-with-icon.invalid {
+    border-color: #e53e3e;
+}
+
+.input-with-icon.invalid .icon {
     color: #e53e3e;
 }
 
