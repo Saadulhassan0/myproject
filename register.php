@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Prevent PHP errors from being displayed directly (they break JSON)
 error_reporting(E_ALL);
 ini_set('display_errors', 0);

@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 // Prevent PHP errors from being displayed directly
 error_reporting(E_ALL);

@@ -1,0 +1,15 @@
+-- Database Setup for DSA Visualizer
+CREATE DATABASE IF NOT EXISTS user_auth;
+USE user_auth;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    cnic VARCHAR(15) NOT NULL UNIQUE,
+    phone VARCHAR(15) NOT NULL,
+    dob DATE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profile_pic VARCHAR(255) DEFAULT 'default.png',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

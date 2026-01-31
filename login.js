@@ -1,19 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("DSA Visualizer: JS Loaded Successfully");
 
-    // Environment Check: Prevent usage with Live Server (Port 5500)
-    if (window.location.port === '5500') {
-        console.warn("ENVIRONMENT ERROR: VS Code Live Server detected.");
+    // Environment Check: Prevent usage with internal previews or Live Server
+    const isLiveServer = window.location.port === '5500';
+    const isAntigravityPreview = window.location.hostname.includes('antigravity') || window.location.hostname.includes('webcontainer');
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (isLiveServer || isAntigravityPreview || !isLocalhost) {
+        console.warn("ENVIRONMENT ERROR: PHP Environment issues detected.");
         const warning = document.createElement('div');
-        warning.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:sans-serif;';
+        warning.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:sans-serif;';
+
+        let errorMsg = `You are currently using <b>${isAntigravityPreview ? 'Antigravity Preview' : 'VS Code Live Server'}</b>, which <u>cannot</u> run PHP code.`;
+        if (!isLocalhost && !isAntigravityPreview) errorMsg = `This project MUST be run through a PHP server like XAMPP.`;
+
         warning.innerHTML = `
             <h1 style="color:#ff4444; font-size:32px; margin-bottom:20px;">⚠️ STOP: WRONG ENVIRONMENT</h1>
-            <p style="font-size:18px; margin-bottom:15px;">You are currently using <b>VS Code Live Server</b>, which <u>cannot</u> run PHP code.</p>
-            <p style="font-size:20px; color:#aaa; margin-bottom:30px;">To fix your login errors, you MUST use XAMPP:</p>
-            <div style="background:#333; padding:15px 30px; border-radius:10px; border:1px solid #555;">
-                <p style="margin:5px 0;">1. Open your browser</p>
-                <p style="margin:5px 0;">2. Type this address: <b style="color:#6c4ce0; font-size:22px;">http://localhost/myproject/login.html</b></p>
-                <p style="margin:5px 0;">3. Press Enter</p>
+            <p style="font-size:18px; margin-bottom:15px;">${errorMsg}</p>
+            <p style="font-size:20px; color:#aaa; margin-bottom:30px;">To fix this and make registration work, you MUST use XAMPP:</p>
+            <div style="background:#333; padding:20px 40px; border-radius:10px; border:1px solid #555; text-align:left;">
+                <p style="margin:8px 0;">1. Open your <b>XAMPP Control Panel</b></p>
+                <p style="margin:8px 0;">2. Click <b>Start</b> for Apache and MySQL</p>
+                <p style="margin:8px 0;">3. Open your browser and go to: <br><b style="color:#6c4ce0; font-size:20px;">http://localhost/myproject/login.html</b></p>
             </div>
             <p style="margin-top:30px; color:#ff4444;">Please close this tab and use the address above!</p>
         `;
@@ -414,42 +422,56 @@ document.addEventListener('DOMContentLoaded', function () {
         fields.forEach(field => {
             const input = document.getElementById(field.id);
             const errorElement = document.getElementById(field.errorId);
-            const value = input.value.trim();
 
-            if (!value) {
-                showError(errorElement, field.msg);
-                isValid = false;
+            if (!input || !errorElement) return;
+
+            if (input.type === 'checkbox') {
+                // Checkbox specific validation
+                if (!input.checked) {
+                    showError(errorElement, field.msg);
+                    isValid = false;
+                }
+            } else if (input.type === 'file') {
+                // File specific validation
+                if (!input.files || input.files.length === 0) {
+                    showError(errorElement, field.msg);
+                    isValid = false;
+                }
             } else {
-                // Additional format checks if already filled
-                if (field.id === 'regName' && !/^[A-Za-z\s]+$/.test(value)) {
-                    showError(errorElement, 'Name can only contain letters and spaces');
+                // Text/Password/Email validation
+                const value = input.value.trim();
+                if (!value) {
+                    showError(errorElement, field.msg);
                     isValid = false;
-                } else if (field.id === 'regName' && value.length < 3) {
-                    showError(errorElement, 'Name must be at least 3 characters');
-                    isValid = false;
-                } else if (field.id === 'regEmail' && !validateEmail(value)) {
-                    showError(errorElement, 'Please enter a valid email address');
-                    isValid = false;
-                } else if (field.id === 'regCNIC' && !/^\d{5}-\d{7}-\d$/.test(value)) {
-                    showError(errorElement, 'Please enter a valid CNIC');
-                    isValid = false;
-                } else if (field.id === 'regPhone') {
-                    if (!value.startsWith('03')) {
-                        showError(errorElement, 'Phone must start with 03');
+                } else {
+                    // Additional format checks
+                    if (field.id === 'regName' && !/^[A-Za-z\s]+$/.test(value)) {
+                        showError(errorElement, 'Name can only contain letters and spaces');
                         isValid = false;
-                    } else if (!/^03\d{2}-\d{7}$/.test(value)) {
-                        showError(errorElement, 'Please enter a valid phone number (03xx-xxxxxxx)');
+                    } else if (field.id === 'regName' && value.length < 3) {
+                        showError(errorElement, 'Name must be at least 3 characters');
+                        isValid = false;
+                    } else if (field.id === 'regEmail' && !validateEmail(value)) {
+                        showError(errorElement, 'Please enter a valid email address');
+                        isValid = false;
+                    } else if (field.id === 'regCNIC' && !/^\d{5}-\d{7}-\d$/.test(value)) {
+                        showError(errorElement, 'Please enter a valid CNIC');
+                        isValid = false;
+                    } else if (field.id === 'regPhone') {
+                        if (!value.startsWith('03')) {
+                            showError(errorElement, 'Phone must start with 03');
+                            isValid = false;
+                        } else if (!/^03\d{2}-\d{7}$/.test(value)) {
+                            showError(errorElement, 'Please enter a valid phone number (03xx-xxxxxxx)');
+                            isValid = false;
+                        }
+                    } else if (field.id === 'regPassword' && value.length < 6) {
+                        showError(errorElement, 'Password must be at least 6 characters');
+                        isValid = false;
+                    } else if (field.id === 'regConfirmPassword' && value !== regPassword.value) {
+                        showError(errorElement, 'Passwords do not match');
                         isValid = false;
                     }
-                } else if (field.id === 'regPassword' && value.length < 6) {
-                    showError(errorElement, 'Password must be at least 6 characters');
-                    isValid = false;
-                } else if (field.id === 'regConfirmPassword' && value !== regPassword.value) {
-                    showError(errorElement, 'Passwords do not match');
-                    isValid = false;
-                } else if (field.id === 'regTerms' && !regTerms.checked) {
-                    showError(errorElement, 'You must agree to the terms');
-                    isValid = false;
                 }
             }
         });
