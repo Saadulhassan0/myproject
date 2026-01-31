@@ -33,10 +33,11 @@
                 <small class="error" id="loginPasswordError"></small>
             </div>
 
-            <div class="remember-me-container">
+            <div class="checkbox-container">
                 <input type="checkbox" id="rememberMe">
                 <label for="rememberMe">Remember Me</label>
             </div>
+            <small class="error" id="rememberMeError"></small>
 
 
 
@@ -125,14 +126,11 @@
                 <small class="error" id="regProfilePicError"></small>
             </div>
 
-            <div class="terms-container"
-                style="display: flex; align-items: center; gap: 10px; margin: 15px 0; text-align: left;">
+            <div class="checkbox-container">
                 <input type="checkbox" id="regTerms">
-                <label for="regTerms" style="font-size: 14px; color: #666; cursor: pointer;">I agree to the
-                    terms</label>
+                <label for="regTerms">I agree to the terms</label>
             </div>
-            <small class="error" id="regTermsError"
-                style="margin-top: -10px; margin-bottom: 15px; text-align: left;"></small>
+            <small class="error" id="regTermsError"></small>
 
             <button type="submit" class="pill-btn">REGISTER</button>
             <p>Already have an account? <a href="#" id="showLogin">Login Here</a></p>

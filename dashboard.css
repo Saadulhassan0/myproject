@@ -1476,3 +1476,122 @@ svg line {
         stroke-dashoffset: 0;
     }
 }
+
+/* ==================== RESPONSIVENESS ==================== */
+
+/* Menu Toggle Button (Mobile Only) */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: #6c4ce0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tablet & Mobile Adjustments */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+        padding: 20px;
+    }
+
+    .back-btn {
+        left: 220px;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 250px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 15px 20px 15px;
+        /* Extra top padding for toggle */
+    }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .back-btn {
+        left: 20px;
+        top: 75px;
+        /* Below menu toggle */
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .dsa-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .dsa-btn {
+        width: 100%;
+        margin: 0;
+    }
+
+    .search-container {
+        max-width: 100%;
+    }
+
+    .stats-panel {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 18px;
+    }
+
+    .formula-section code {
+        font-size: 14px;
+    }
+}

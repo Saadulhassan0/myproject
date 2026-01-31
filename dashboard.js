@@ -25,6 +25,30 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Auth check failed:', error);
         });
 
+    // Sidebar Toggle for Mobile
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const dashboardContainer = document.querySelector('.dashboard-container');
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('active');
+            menuToggle.textContent = sidebar.classList.contains('active') ? '✕' : '☰';
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (e) {
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(e.target) &&
+                e.target !== menuToggle) {
+                sidebar.classList.remove('active');
+                menuToggle.textContent = '☰';
+            }
+        });
+    }
+
     // Logout functionality
     const logoutHandler = function (e) {
         if (e) e.preventDefault();

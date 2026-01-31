@@ -127,25 +127,36 @@ input[type="file"] {
     text-decoration: none;
 }
 
-.remember-me-container {
+.checkbox-container {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 6px;
+    margin: 15px 0;
     text-align: left;
 }
 
-.remember-me-container input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+.checkbox-container input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin: 0;
     cursor: pointer;
 }
 
-.remember-me-container label {
+.checkbox-container label {
     font-size: 14px;
-    color: #666;
+    color: #555;
     cursor: pointer;
+    white-space: nowrap;
     user-select: none;
+    line-height: 1;
+}
+
+.checkbox-container+.error {
+    margin-top: -10px;
+    margin-bottom: 15px;
+    text-align: left;
+    font-size: 13px;
+    display: block;
 }
 
 .pill-btn {
@@ -248,27 +259,41 @@ input[type="file"] {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 15px;
     }
 
     .container {
-        padding: 40px 20px;
+        padding: 40px 25px;
+        width: 100%;
+        max-width: 450px;
     }
 
     h2 {
-        font-size: 24px;
+        font-size: 26px;
         margin-bottom: 30px;
     }
+}
 
-    .field-container {
-        margin-bottom: 20px;
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 20px;
+    }
+
+    h2 {
+        font-size: 22px;
     }
 
     .pill-btn {
         padding: 12px;
         font-size: 14px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
+    }
+
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
     }
 }

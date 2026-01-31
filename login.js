@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Error elements
     const loginEmailError = document.getElementById('loginEmailError');
     const loginPasswordError = document.getElementById('loginPasswordError');
+    const rememberMeError = document.getElementById('rememberMeError');
     const regNameError = document.getElementById('regNameError');
     const regEmailError = document.getElementById('regEmailError');
     const regCNICError = document.getElementById('regCNICError');
@@ -518,6 +519,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!loginPassword.value) {
             showError(loginPasswordError, 'Please Enter Your Password');
+            isValid = false;
+        }
+
+        if (rememberMe && !rememberMe.checked) {
+            showError(rememberMeError, 'Please check to remember your email');
             isValid = false;
         }
 
