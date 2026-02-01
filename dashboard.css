@@ -1,4 +1,4 @@
-* {
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -732,132 +732,8 @@ body:not(.has-sidebar) .back-btn {
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-    .sidebar {
-        width: 220px;
-    }
+/* Media queries removed and moved to consolidated section at bottom */
 
-    .main-content {
-        margin-left: 220px;
-        width: calc(100% - 220px);
-        padding: 25px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        width: 70px;
-        padding: 20px 10px;
-    }
-
-    .sidebar h2 {
-        font-size: 0;
-        margin-bottom: 30px;
-    }
-
-    .sidebar h2::after {
-        content: "M";
-        font-size: 20px;
-    }
-
-    .sidebar nav ul li a span {
-        display: none;
-    }
-
-    .main-content {
-        margin-left: 70px;
-        width: calc(100% - 70px);
-        padding: 15px;
-    }
-
-    header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-        padding-top: 80px;
-    }
-
-    header h1 {
-        font-size: 20px;
-    }
-
-    .header-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .dsa-buttons {
-        flex-direction: column;
-    }
-
-    .dsa-btn {
-        width: 100%;
-        min-width: unset;
-    }
-
-    .input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .input-group input,
-    .input-group select {
-        width: 100%;
-    }
-
-    .controls {
-        flex-direction: column;
-    }
-
-    .control-btn {
-        width: 100%;
-    }
-
-    .back-btn {
-        position: absolute;
-        left: 85px;
-        top: 20px;
-        width: auto;
-    }
-
-    .visualization-container {
-        padding: 15px;
-        overflow-x: auto;
-    }
-
-    .array-display {
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .array-element {
-        width: 40px;
-        height: 40px;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .sidebar {
-        width: 50px;
-        padding: 15px 5px;
-    }
-
-    .main-content {
-        margin-left: 50px;
-        width: calc(100% - 50px);
-    }
-
-    .back-btn {
-        left: 65px;
-        font-size: 12px;
-        padding: 8px 12px;
-    }
-
-    .sidebar h2::after {
-        font-size: 16px;
-    }
-}
 
 /* Tree Visualization Styles */
 .tree-container {
@@ -1193,49 +1069,8 @@ body:not(.has-sidebar) .back-btn {
     }
 }
 
-@media (max-width: 768px) {
-    .tree-node .node-value {
-        width: 45px;
-        height: 45px;
-        font-size: 14px;
-    }
+/* Media queries removed and moved to consolidated section at bottom */
 
-    .tree-level {
-        margin: 20px 0;
-    }
-
-    .left-child,
-    .right-child {
-        margin: 0 15px;
-    }
-
-    .left-child::before,
-    .right-child::before {
-        width: 15px;
-    }
-
-    .circular-queue-container {
-        height: 300px;
-        transform: scale(0.85);
-    }
-}
-
-@media (max-width: 480px) {
-    .circular-queue-container {
-        height: 250px;
-        transform: scale(0.7);
-    }
-
-    .tree-node .node-value {
-        width: 35px;
-        height: 35px;
-        font-size: 12px;
-    }
-
-    .node-value .balance-factor {
-        font-size: 8px;
-    }
-}
 
 .circular-connection {
     position: absolute;
@@ -1262,13 +1097,8 @@ body:not(.has-sidebar) .back-btn {
     border-radius: 10px;
 }
 
-@media (max-width: 600px) {
-    .queue-pointers {
-        flex-direction: column;
-        gap: 15px;
-        align-items: center;
-    }
-}
+/* Media queries removed and moved to consolidated section at bottom */
+
 
 .pointer {
     display: flex;
@@ -1500,6 +1330,9 @@ svg line {
 }
 
 /* Tablet & Mobile Adjustments */
+/* ==================== CONSOLIDATED RESPONSIVENESS ==================== */
+
+/* Tablet Adjustments */
 @media (max-width: 1024px) {
     .sidebar {
         width: 200px;
@@ -1516,7 +1349,7 @@ svg line {
     }
 }
 
-/* Mobile Devices */
+/* Mobile Devices (600px to 768px) */
 @media (max-width: 768px) {
     .menu-toggle {
         display: flex;
@@ -1533,65 +1366,227 @@ svg line {
         transform: translateX(0);
     }
 
-    .main-content {
+    .sidebar h2 {
+        font-size: 21px;
+        /* Slightly smaller to fit with X */
+        margin-bottom: 40px;
+        padding-right: 30px;
+        /* Space for the X button */
+        text-align: left;
+    }
+
+    .sidebar h2::after {
+        content: "";
+        /* Reset from previous dispersed rules */
+    }
+
+    .sidebar nav ul li a span {
+        display: inline;
+        /* Keep icons on mobile sidebar */
+    }
+
+    .has-sidebar .main-content {
         margin-left: 0;
         width: 100%;
-        padding: 80px 15px 20px 15px;
-        /* Extra top padding for toggle */
+        padding: 120px 15px 20px 15px;
     }
 
     header {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         align-items: flex-start;
-        padding-top: 10px;
+        padding-top: 20px;
+        border-bottom: none;
     }
 
     header h1 {
-        font-size: 22px;
+        font-size: 20px;
+        margin-top: 10px;
+    }
+
+    #welcomeMsg {
+        word-break: break-word;
+        /* Ensure long names don't overflow */
     }
 
     .header-actions {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-end;
+        gap: 10px;
     }
 
     .back-btn {
-        left: 20px;
+        position: absolute;
+        left: 15px;
         top: 75px;
-        /* Below menu toggle */
-        padding: 8px 15px;
+        margin-bottom: 0;
+        width: auto;
+        z-index: 1000;
         font-size: 13px;
+        padding: 8px 15px;
     }
 
+    /* Algorithm Selection Buttons */
     .dsa-buttons {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 10px;
     }
 
     .dsa-btn {
         width: 100%;
-        margin: 0;
+        min-width: unset;
+        font-size: 14px;
+        padding: 12px 20px;
     }
 
-    .search-container {
-        max-width: 100%;
+    /* Visualization Controls */
+    .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .stats-panel {
+    .control-btn {
+        width: 100%;
+        min-width: unset;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+
+    .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 15px;
+        /* Added gap between subgroups */
+    }
+
+    .input-subgroup {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+    }
+
+    .input-subgroup label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .input-group input,
+    .input-group select {
+        width: 100%;
+    }
+
+    .speed-control {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .speed-control input {
+        width: 100%;
+    }
+
+    /* Visualization Elements */
+    .visualization-container {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    .array-display {
+        gap: 5px;
+        padding: 10px;
+        min-height: 120px;
+    }
+
+    .array-element {
+        width: 35px;
+        height: 35px;
+        font-size: 12px;
+    }
+
+    .tree-node .node-value {
+        width: 45px;
+        height: 45px;
+        font-size: 14px;
+    }
+
+    .tree-level {
+        margin: 20px 0;
+    }
+
+    .left-child,
+    .right-child {
+        margin: 0 15px;
+    }
+
+    .left-child::before,
+    .right-child::before {
+        width: 15px;
+    }
+
+    .circular-queue-container {
+        height: 300px;
+        transform: scale(0.8);
+    }
+
+    .queue-pointers {
         flex-direction: column;
         gap: 15px;
         align-items: center;
     }
 }
 
+/* Small Mobile Devices (Up to 480px) */
 @media (max-width: 480px) {
     header h1 {
         font-size: 18px;
     }
 
+    .back-btn {
+        font-size: 12px;
+    }
+
     .formula-section code {
         font-size: 14px;
+    }
+
+    .array-element {
+        width: 30px;
+        height: 30px;
+        font-size: 10px;
+    }
+
+    .tree-node .node-value {
+        width: 35px;
+        height: 35px;
+        font-size: 12px;
+    }
+
+    .node-value .balance-factor {
+        font-size: 8px;
+    }
+
+    .circular-queue-container {
+        height: 250px;
+        transform: scale(0.65);
+    }
+
+    .stats-panel {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    .sidebar.active~.menu-toggle {
+        position: fixed;
+        left: auto;
+        right: 20px;
+        top: 20px;
+        z-index: 1001;
     }
 }

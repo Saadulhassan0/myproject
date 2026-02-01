@@ -1051,8 +1051,37 @@ function generateNewArray() {
 
     currentArray = generateArray(size);
     displayArray(currentArray);
+
+    // Clear manual input if it exists
+    const manualInput = document.getElementById('manualArrayInput');
+    if (manualInput) manualInput.value = '';
+
     clearSteps();
     showStatus(`Generated new array with ${size} random elements`, 'success');
+}
+
+function setManualArray() {
+    const input = document.getElementById('manualArrayInput');
+    if (!input) return;
+
+    const value = input.value.trim();
+    if (!value) {
+        showStatus('Please enter some numbers separated by commas', 'error');
+        return;
+    }
+
+    // Parse comma separated values
+    const arr = value.split(',').map(item => parseInt(item.trim())).filter(num => !isNaN(num));
+
+    if (arr.length < 3 || arr.length > 20) {
+        showStatus('Please enter between 3 and 20 numbers', 'error');
+        return;
+    }
+
+    currentArray = arr;
+    displayArray(currentArray);
+    clearSteps();
+    showStatus(`Successfully loaded manual array with ${arr.length} elements`, 'success');
 }
 
 function updateSpeed() {
@@ -1195,8 +1224,16 @@ function createSortingContent(title, type) {
         
         <div class="controls">
             <div class="input-group">
-                <input type="number" id="arraySize" placeholder="Array Size (3-20)" value="8" min="3" max="20">
-                <button class="control-btn" onclick="generateNewArray()">Generate New Array</button>
+                <div class="input-subgroup">
+                    <label for="arraySize">Random Array:</label>
+                    <input type="number" id="arraySize" placeholder="Size (3-20)" value="8" min="3" max="20">
+                    <button class="control-btn" onclick="generateNewArray()">Generate Random</button>
+                </div>
+                <div class="input-subgroup">
+                    <label for="manualArrayInput">Manual Input:</label>
+                    <input type="text" id="manualArrayInput" placeholder="e.g. 10, 5, 8, 20">
+                    <button class="control-btn" onclick="setManualArray()">Set Array</button>
+                </div>
             </div>
             
             <div class="speed-control">
@@ -1244,14 +1281,24 @@ function createSearchContent() {
         
         <div class="controls">
             <div class="input-group">
-                <input type="number" id="arraySize" placeholder="Array Size (3-20)" value="8" min="3" max="20">
-                <button class="control-btn" onclick="generateNewArray()">Generate New Array</button>
+                <div class="input-subgroup">
+                    <label for="arraySize">Random Array:</label>
+                    <input type="number" id="arraySize" placeholder="Size (3-20)" value="8" min="3" max="20">
+                    <button class="control-btn" onclick="generateNewArray()">Generate Random</button>
+                </div>
+                <div class="input-subgroup">
+                    <label for="manualArrayInput">Manual Input:</label>
+                    <input type="text" id="manualArrayInput" placeholder="e.g. 10, 5, 8, 20">
+                    <button class="control-btn" onclick="setManualArray()">Set Array</button>
+                </div>
             </div>
             
             <div class="input-group">
-                <input type="number" id="searchValue" placeholder="Enter value to search">
-                <button class="control-btn start" onclick="startLinearSearch()">Linear Search</button>
-                <button class="control-btn" onclick="startBinarySearch()">Binary Search</button>
+                <div class="input-subgroup search-subgroup">
+                    <input type="number" id="searchValue" placeholder="Value to search">
+                    <button class="control-btn start" onclick="startLinearSearch()">Linear Search</button>
+                    <button class="control-btn" onclick="startBinarySearch()">Binary Search</button>
+                </div>
             </div>
             
             <div class="speed-control">
@@ -2036,9 +2083,9 @@ function renderTreeNode(node, x, y, gap, container, svg) {
 
     // Create node element
     const nodeDiv = document.createElement('div');
-    nodeDiv.className = `tree - node ${node.highlight || ''} `;
-    nodeDiv.style.left = `${x} px`;
-    nodeDiv.style.top = `${y} px`;
+    nodeDiv.className = `tree-node ${node.highlight || ''}`;
+    nodeDiv.style.left = `${x}px`;
+    nodeDiv.style.top = `${y}px`;
     nodeDiv.setAttribute('data-value', node.value);
 
     const valueDiv = document.createElement('div');
@@ -2048,17 +2095,21 @@ function renderTreeNode(node, x, y, gap, container, svg) {
 
     container.appendChild(nodeDiv);
 
-    const nextGap = gap / 2;
     const nextY = y + 100;
 
+    // Responsive gap adjustment
+    const minGap = window.innerWidth <= 768 ? 25 : 40;
+    const currentGap = Math.max(gap, minGap * 1.5);
+    const nextGap = gap / 2;
+
     if (node.left) {
-        const nextX = x - gap / 1.5;
+        const nextX = x - currentGap;
         drawTreeArrow(x, y, nextX, nextY, svg);
         renderTreeNode(node.left, nextX, nextY, nextGap, container, svg);
     }
 
     if (node.right) {
-        const nextX = x + gap / 1.5;
+        const nextX = x + currentGap;
         drawTreeArrow(x, y, nextX, nextY, svg);
         renderTreeNode(node.right, nextX, nextY, nextGap, container, svg);
     }
@@ -2403,9 +2454,9 @@ function renderAVLTreeNode(node, x, y, gap, container, svg) {
 
     // Create node element
     const nodeDiv = document.createElement('div');
-    nodeDiv.className = `tree - node avl - node ${balanceClass} ${node.highlight || ''} `;
-    nodeDiv.style.left = `${x} px`;
-    nodeDiv.style.top = `${y} px`;
+    nodeDiv.className = `tree-node avl-node ${balanceClass} ${node.highlight || ''}`;
+    nodeDiv.style.left = `${x}px`;
+    nodeDiv.style.top = `${y}px`;
     nodeDiv.setAttribute('data-value', node.value);
 
     const valueDiv = document.createElement('div');
@@ -2415,17 +2466,21 @@ function renderAVLTreeNode(node, x, y, gap, container, svg) {
 
     container.appendChild(nodeDiv);
 
-    const nextGap = gap / 2;
     const nextY = y + 100;
 
+    // Responsive gap adjustment
+    const minGap = window.innerWidth <= 768 ? 25 : 40;
+    const currentGap = Math.max(gap, minGap * 1.5);
+    const nextGap = gap / 2;
+
     if (node.left) {
-        const nextX = x - gap / 1.5;
+        const nextX = x - currentGap;
         drawTreeArrow(x, y, nextX, nextY, svg);
         renderAVLTreeNode(node.left, nextX, nextY, nextGap, container, svg);
     }
 
     if (node.right) {
-        const nextX = x + gap / 1.5;
+        const nextX = x + currentGap;
         drawTreeArrow(x, y, nextX, nextY, svg);
         renderAVLTreeNode(node.right, nextX, nextY, nextGap, container, svg);
     }
@@ -2910,8 +2965,8 @@ function updateCircularQueueVisualization() {
         const cell = document.createElement('div');
         cell.className = 'queue-cell';
         cell.style.position = 'absolute';
-        cell.style.left = `${x} px`;
-        cell.style.top = `${y} px`;
+        cell.style.left = `${x}px`;
+        cell.style.top = `${y}px`;
         cell.style.transform = 'translate(-50%, -50%)';
 
         // Add cell number
@@ -2948,9 +3003,9 @@ function updateCircularQueueVisualization() {
             const arrow = document.createElement('div');
             arrow.className = 'queue-arrow';
             arrow.style.position = 'absolute';
-            arrow.style.left = `${x} px`;
-            arrow.style.top = `${y} px`;
-            arrow.style.width = `${Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2))} px`;
+            arrow.style.left = `${x}px`;
+            arrow.style.top = `${y}px`;
+            arrow.style.width = `${Math.sqrt(Math.pow(nextX - x, 2) + Math.pow(nextY - y, 2))}px`;
             arrow.style.transform = `rotate(${Math.atan2(nextY - y, nextX - x)}rad)`;
             arrow.style.transformOrigin = '0 0';
 
@@ -2972,9 +3027,9 @@ function updateCircularQueueVisualization() {
         const arrow = document.createElement('div');
         arrow.className = 'queue-arrow circular-arrow';
         arrow.style.position = 'absolute';
-        arrow.style.left = `${lastX} px`;
-        arrow.style.top = `${lastY} px`;
-        arrow.style.width = `${Math.sqrt(Math.pow(firstX - lastX, 2) + Math.pow(firstY - lastY, 2))} px`;
+        arrow.style.left = `${lastX}px`;
+        arrow.style.top = `${lastY}px`;
+        arrow.style.width = `${Math.sqrt(Math.pow(firstX - lastX, 2) + Math.pow(firstY - lastY, 2))}px`;
         arrow.style.transform = `rotate(${Math.atan2(firstY - lastY, firstX - lastX)}rad)`;
         arrow.style.transformOrigin = '0 0';
 
